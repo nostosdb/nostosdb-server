@@ -1,0 +1,14 @@
+[package]
+name = "nostos-server"
+description = "Stage 0 server skeleton for NostosDB"
+edition = "2024"
+license = "SSPL-1.0"
+publish = false
+rust-version = "1.85"
+version = "0.1.0"
+
+[dependencies]
+nostos-engine = { path = "../nostos-core/crates/nostos-engine", version = "0.1.0" }
+
+[lints.rust]
+unsafe_code = "forbid"
