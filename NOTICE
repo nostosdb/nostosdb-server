@@ -2,4 +2,12 @@ nostos-server
 
 Licensed under the Server Side Public License, Version 1 (SSPL-1.0).
 Copyright ownership and attribution are pending legal review before public release.
-This NOTICE contains no additional third-party attribution notices.
+
+This software uses third-party Rust crates under permissive licenses, including:
+
+- Tokio, Axum, Tower HTTP, tracing, tracing-subscriber, and UUID under MIT terms.
+- Serde, serde_json, and futures utilities under MIT or Apache-2.0 terms.
+- rusqlite/libsqlite3-sys and their transitive dependencies through nostos-engine;
+  bundled SQLite is in the public domain and the Rust bindings use permissive terms.
+
+Full per-package license bundling and legal review remain required before distribution.
