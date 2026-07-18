@@ -44,6 +44,8 @@ impl TestServer {
 
 impl Drop for TestServer {
     fn drop(&mut self) {
+        let app = std::mem::replace(&mut self.app, Router::new());
+        drop(app);
         std::fs::remove_dir_all(&self.directory).expect("temporary directory removes");
     }
 }
