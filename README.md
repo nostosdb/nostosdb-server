@@ -1,4 +1,4 @@
-# nostos-server
+# nostosdb-server
 
 Source-available implementation repository for the installable single-node NostosDB database daemon, licensed under SSPL-1.0.
 
@@ -23,10 +23,10 @@ Initialization refuses to adopt a non-empty directory. It creates the versioned 
 From the sibling CLI repository:
 
 ```bash
-../nostos-cli/target/debug/nostos database create knowledge \
+../nostosdb-cli/target/debug/nostos database create knowledge \
   --server nostos://127.0.0.1:7878 \
   --credential-file ./evaluation/data/credentials/admin.token
-../nostos-cli/target/debug/nostos query \
+../nostosdb-cli/target/debug/nostos query \
   --server nostos://127.0.0.1:7878 --database knowledge \
   --credential-file ./evaluation/data/credentials/client.token \
   'RETURN 1 AS ready'

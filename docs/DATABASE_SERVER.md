@@ -8,7 +8,7 @@ Status: Implemented source-preview architecture; release, production hardening, 
 
 It is not an application REST API server. Applications do not integrate by opening `.ndb` files or by depending on resource-oriented HTTP endpoints. They connect through the versioned NostosDB database protocol and select a logical Database name.
 
-The repository remains named `nostos-server`; the daemon executable is `nostosd` so service managers and operators can distinguish it from the `nostos` client.
+The repository is named `nostosdb-server`; the daemon executable is `nostosd` so service managers and operators can distinguish it from the `nostos` client.
 
 ## Deployment modes
 

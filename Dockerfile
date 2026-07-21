@@ -1,19 +1,19 @@
 # syntax=docker/dockerfile:1
 FROM rust:1.85-bookworm AS build
 WORKDIR /source
-COPY nostos-core ./nostos-core
-COPY nostos-server ./nostos-server
-COPY nostos-cli ./nostos-cli
-RUN cargo build --locked --release --manifest-path nostos-server/Cargo.toml --bin nostosd \
-    && cargo build --locked --release --manifest-path nostos-cli/Cargo.toml --bin nostos
+COPY nostosdb-core ./nostosdb-core
+COPY nostosdb-server ./nostosdb-server
+COPY nostosdb-cli ./nostosdb-cli
+RUN cargo build --locked --release --manifest-path nostosdb-server/Cargo.toml --bin nostosd \
+    && cargo build --locked --release --manifest-path nostosdb-cli/Cargo.toml --bin nostos
 
 FROM debian:bookworm-slim
 RUN groupadd --system --gid 1700 nostosdb \
     && useradd --system --uid 1700 --gid nostosdb --home-dir /var/lib/nostosdb --shell /usr/sbin/nologin nostosdb \
     && install -d -o nostosdb -g nostosdb -m 0700 /var/lib/nostosdb \
     && install -d -o nostosdb -g nostosdb -m 0700 /etc/nostosdb
-COPY --from=build /source/nostos-server/target/release/nostosd /usr/local/bin/nostosd
-COPY --from=build /source/nostos-cli/target/release/nostos /usr/local/bin/nostos
+COPY --from=build /source/nostosdb-server/target/release/nostosd /usr/local/bin/nostosd
+COPY --from=build /source/nostosdb-cli/target/release/nostos /usr/local/bin/nostos
 USER nostosdb:nostosdb
 VOLUME ["/etc/nostosdb", "/var/lib/nostosdb"]
 EXPOSE 7878

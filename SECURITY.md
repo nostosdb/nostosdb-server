@@ -1,4 +1,4 @@
-# Security policy for nostos-server
+# Security policy for nostosdb-server
 
 There is no supported Server release or production security SLA. Current `main` is single-node evaluation software.
 

@@ -1,4 +1,4 @@
-# Contributing to nostos-server
+# Contributing to nostosdb-server
 
 The Server source is available for evaluation, but external contributions are closed pending legal/CLA approval. Do not submit patches or pull requests expecting inclusion; [CLA.md](CLA.md) is status only.
 

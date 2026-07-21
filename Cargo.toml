@@ -21,7 +21,7 @@ base64 = "=0.22.1"
 fs2 = "=0.4.3"
 futures-util = "0.3.31"
 nostos-client = { path = "client", version = "0.1.0" }
-nostos-engine = { path = "../nostos-core/crates/nostos-engine", version = "0.1.0" }
+nostos-engine = { path = "../nostosdb-core/crates/nostos-engine", version = "0.1.0" }
 serde = { version = "1.0.228", features = ["derive"] }
 serde_json = "1.0.150"
 tokio = { version = "~1.51", features = ["io-util", "macros", "net", "rt-multi-thread", "signal", "sync", "time"] }

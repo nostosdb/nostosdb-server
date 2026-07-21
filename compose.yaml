@@ -3,7 +3,7 @@ services:
     profiles: ["init"]
     build:
       context: ..
-      dockerfile: nostos-server/Dockerfile
+      dockerfile: nostosdb-server/Dockerfile
     command:
       - init
       - --data-dir
@@ -19,7 +19,7 @@ services:
   server:
     build:
       context: ..
-      dockerfile: nostos-server/Dockerfile
+      dockerfile: nostosdb-server/Dockerfile
     ports:
       - "127.0.0.1:7878:7878"
     volumes:

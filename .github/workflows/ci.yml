@@ -20,26 +20,26 @@ jobs:
     steps:
       - name: Check out Server
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
-        with: {path: nostos-server}
+        with: {path: nostosdb-server}
       - name: Check out Core
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
-        with: {repository: nostosdb/nostosdb-core, path: nostos-core}
+        with: {repository: nostosdb/nostosdb-core, path: nostosdb-core}
       - name: Configure Rust
         run: rustup toolchain install ${{ matrix.rust }} --profile minimal --component rustfmt,clippy
       - name: Format
-        working-directory: nostos-server
+        working-directory: nostosdb-server
         run: rustup run ${{ matrix.rust }} cargo fmt --all --check
       - name: Check
-        working-directory: nostos-server
+        working-directory: nostosdb-server
         run: rustup run ${{ matrix.rust }} cargo check --all-targets --all-features --locked
       - name: Clippy
-        working-directory: nostos-server
+        working-directory: nostosdb-server
         run: rustup run ${{ matrix.rust }} cargo clippy --all-targets --all-features --locked -- -D warnings
       - name: Test
-        working-directory: nostos-server
+        working-directory: nostosdb-server
         run: rustup run ${{ matrix.rust }} cargo test --all-features --locked
       - name: Rustdoc
-        working-directory: nostos-server
+        working-directory: nostosdb-server
         env: {RUSTDOCFLAGS: "-D warnings"}
         run: rustup run ${{ matrix.rust }} cargo doc --all-features --no-deps --locked
 
