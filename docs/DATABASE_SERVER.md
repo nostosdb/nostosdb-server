@@ -155,6 +155,18 @@ The first implementation may serialize physical write transactions, but that is 
 
 ## Installation and service operation
 
+The package-manager command targets are explicit and currently unpublished:
+
+```bash
+# Server plus matching CLI; npm wrapper not implemented yet
+npm install --global @nostosdb/server
+
+# Server plus CLI on macOS
+brew install nostosdb/tap/nostosdb
+```
+
+Both install surfaces expose `nostosd` and `nostos`. The npm Server package will depend on the exact matching `@nostosdb/cli`; neither path installs a separate `@nostosdb/core` package.
+
 The release target includes the same `nostosd` binary for foreground, native-service, and container execution:
 
 ```text
@@ -171,13 +183,15 @@ Target defaults keep platform conventions without making their paths part of Dat
 
 | Environment | Configuration | Data directory | Service form |
 |---|---|---|---|
-| Homebrew macOS | `${HOMEBREW_PREFIX}/etc/nostosdb/server.toml` | `${HOMEBREW_PREFIX}/var/nostosdb` | Homebrew service definition |
+| Homebrew macOS | `~/.nostosdb/config/server.toml` | `~/.nostosdb/data` | per-user `nostosdb` Homebrew service; logs in `~/.nostosdb/logs` |
 | Linux system package | `/etc/nostosdb/server.toml` | `/var/lib/nostosdb` | systemd unit with a dedicated account |
 | Windows package | `%PROGRAMDATA%\\NostosDB\\server.toml` | `%PROGRAMDATA%\\NostosDB\\data` | Windows Service with a restricted identity |
 | Docker | `/etc/nostosdb/server.toml` | `/var/lib/nostosdb` | foreground PID 1 with a named volume |
 | Direct developer run | explicit `--config` | explicit initialized directory | foreground process |
 
 Every default is overridable through explicit installation/configuration. The daemon records normalized paths only as local operational state; protocol clients see stable Database IDs and names.
+
+`nostosd` resolves an omitted `--config` in this order: `NOSTOS_CONFIG`, `NOSTOS_HOME/config/server.toml`, then the platform default above. The Homebrew service sets `NOSTOS_HOME` to the installing user's `~/.nostosdb` and should be run without `sudo`. Homebrew's package and service name is `nostosdb`; the executable names remain `nostos` and `nostosd`.
 
 The Docker contract mounts separate configuration and authoritative data volumes. The unpublished local candidate is initialized once, then its default `nostosd serve --config /etc/nostosdb/server.toml` command runs as PID 1:
 

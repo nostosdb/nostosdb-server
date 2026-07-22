@@ -18,10 +18,17 @@ fn native_services_execute_the_same_daemon_config_contract() {
 
     let homebrew = fs::read_to_string(root().join("distribution/homebrew/Formula/nostosdb.rb.in"))
         .expect("Homebrew candidate reads");
+    assert!(homebrew.contains("class Nostosdb < Formula"));
     assert!(homebrew.contains("bin.install \"nostos\", \"nostosd\""));
     assert!(homebrew.contains(
-        "run [opt_bin/\"nostosd\", \"serve\", \"--config\", etc/\"nostosdb/server.toml\"]"
+        "run [opt_bin/\"nostosd\", \"serve\", \"--config\", (nostos_home/\"config/server.toml\").to_s]"
     ));
+    assert!(homebrew.contains("Pathname.new(Dir.home)/\".nostosdb\""));
+    assert!(homebrew.contains("data_dir = nostos_home/\"data\""));
+    assert!(homebrew.contains("logs_dir = nostos_home/\"logs\""));
+    assert!(homebrew.contains("environment_variables NOSTOS_HOME: nostos_home.to_s"));
+    assert!(!homebrew.contains("etc/\"nostosdb"));
+    assert!(!homebrew.contains("var/\"nostosdb"));
     assert!(homebrew.contains("\"--listen\", \"127.0.0.1:7878\""));
 
     let windows = fs::read_to_string(root().join("distribution/windows/install-service.ps1"))

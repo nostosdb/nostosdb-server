@@ -8,6 +8,21 @@ The implemented product path is `nostosd`: a long-running process that owns a ve
 
 The old `nostos-server` binary still opens one explicit `.ndb` and exposes HTTP protocol version 1 for current MCP compatibility. It is transitional, separately versioned, and must not be presented as the database product or as an application REST API platform.
 
+## Package-manager targets
+
+The intended global npm package installs the Server and matching CLI together; the Homebrew formula exposes the same two commands on macOS:
+
+```bash
+npm install --global @nostosdb/server
+# or
+brew install nostosdb/tap/nostosdb
+
+nostosd --version
+nostos --version
+```
+
+Neither channel is published. The `@nostosdb/server` npm wrapper is also not implemented yet; the native binaries and Homebrew candidate are implemented. CLI-only users install the separate `@nostosdb/cli` package.
+
 ## Initialize and run `nostosd`
 
 ```bash
@@ -40,7 +55,7 @@ The managed tree uses immutable UUID Database IDs internally and never exposes p
 
 Candidate definitions are under [distribution](distribution/README.md):
 
-- Homebrew formula and service for `${HOMEBREW_PREFIX}/etc/nostosdb` and `${HOMEBREW_PREFIX}/var/nostosdb`;
+- Homebrew formula `nostosdb`, commands `nostos`/`nostosd`, and a per-user service rooted at `~/.nostosdb`;
 - systemd service for `/etc/nostosdb/server.toml` and `/var/lib/nostosdb`;
 - explicit Windows Service registration for `%PROGRAMDATA%\NostosDB\server.toml`;
 - [Dockerfile](Dockerfile) and [compose.yaml](compose.yaml) with separate config and authoritative data volumes.

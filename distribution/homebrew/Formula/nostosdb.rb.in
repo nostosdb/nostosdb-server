@@ -22,23 +22,31 @@ class Nostosdb < Formula
   end
 
   def post_install
-    (etc/"nostosdb").mkpath
-    (var/"nostosdb").mkpath
-    config = etc/"nostosdb/server.toml"
+    nostos_home = Pathname.new(Dir.home)/".nostosdb"
+    config_dir = nostos_home/"config"
+    data_dir = nostos_home/"data"
+    logs_dir = nostos_home/"logs"
+    config_dir.mkpath
+    data_dir.mkpath
+    logs_dir.mkpath
+    nostos_home.chmod(0700)
+    config = config_dir/"server.toml"
     return if config.exist?
 
     system bin/"nostosd", "init",
-      "--data-dir", var/"nostosdb",
+      "--data-dir", data_dir,
       "--config", config,
       "--listen", "127.0.0.1:7878"
   end
 
   service do
-    run [opt_bin/"nostosd", "serve", "--config", etc/"nostosdb/server.toml"]
+    nostos_home = Pathname.new(Dir.home)/".nostosdb"
+    run [opt_bin/"nostosd", "serve", "--config", (nostos_home/"config/server.toml").to_s]
     keep_alive true
-    log_path var/"log/nostosdb.log"
-    error_log_path var/"log/nostosdb.log"
-    working_dir var/"nostosdb"
+    environment_variables NOSTOS_HOME: nostos_home.to_s
+    log_path (nostos_home/"logs/nostosd.log").to_s
+    error_log_path (nostos_home/"logs/nostosd.log").to_s
+    working_dir nostos_home.to_s
   end
 
   test do

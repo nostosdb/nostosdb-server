@@ -18,6 +18,8 @@ Usage:
 
 Initialization creates separate protected client and admin credential files.
 Credential values are never accepted as command-line arguments.
+Configuration lookup is --config, NOSTOS_CONFIG, NOSTOS_HOME/config/server.toml,
+then the platform default.
 The default database-protocol listener is 127.0.0.1:7878.";
 
 #[tokio::main]
@@ -141,16 +143,37 @@ async fn serve(config_path: PathBuf) -> Result<(), String> {
 }
 
 fn default_config_path() -> PathBuf {
-    if let Some(path) = env::var_os("NOSTOS_CONFIG") {
-        return PathBuf::from(path);
-    }
+    select_default_config_path(
+        environment_path("NOSTOS_CONFIG"),
+        environment_path("NOSTOS_HOME"),
+        platform_default_config_path(),
+    )
+}
+
+fn select_default_config_path(
+    config_path: Option<PathBuf>,
+    nostos_home: Option<PathBuf>,
+    platform_default: PathBuf,
+) -> PathBuf {
+    config_path
+        .or_else(|| nostos_home.map(|path| path.join("config/server.toml")))
+        .unwrap_or(platform_default)
+}
+
+fn environment_path(name: &str) -> Option<PathBuf> {
+    env::var_os(name)
+        .filter(|value| !value.is_empty())
+        .map(PathBuf::from)
+}
+
+fn platform_default_config_path() -> PathBuf {
     #[cfg(windows)]
-    if let Some(program_data) = env::var_os("PROGRAMDATA") {
-        return PathBuf::from(program_data).join("NostosDB/server.toml");
+    if let Some(program_data) = environment_path("PROGRAMDATA") {
+        return program_data.join("NostosDB/server.toml");
     }
     #[cfg(target_os = "macos")]
-    if let Some(prefix) = env::var_os("HOMEBREW_PREFIX") {
-        return PathBuf::from(prefix).join("etc/nostosdb/server.toml");
+    if let Some(home) = environment_path("HOME") {
+        return home.join(".nostosdb/config/server.toml");
     }
     #[cfg(target_os = "linux")]
     {
@@ -181,5 +204,35 @@ fn init_tracing() -> Result<(), String> {
 async fn shutdown_signal() {
     if let Err(error) = tokio::signal::ctrl_c().await {
         tracing::error!(%error, "failed to install shutdown signal handler");
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::select_default_config_path;
+    use std::path::PathBuf;
+
+    #[test]
+    fn config_environment_has_priority_over_nostos_home() {
+        assert_eq!(
+            select_default_config_path(
+                Some(PathBuf::from("/explicit/server.toml")),
+                Some(PathBuf::from("/user/.nostosdb")),
+                PathBuf::from("/platform/server.toml"),
+            ),
+            PathBuf::from("/explicit/server.toml")
+        );
+    }
+
+    #[test]
+    fn nostos_home_contains_the_default_config_directory() {
+        assert_eq!(
+            select_default_config_path(
+                None,
+                Some(PathBuf::from("/user/.nostosdb")),
+                PathBuf::from("/platform/server.toml"),
+            ),
+            PathBuf::from("/user/.nostosdb/config/server.toml")
+        );
     }
 }
