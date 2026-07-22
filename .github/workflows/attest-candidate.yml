@@ -23,13 +23,13 @@ jobs:
     runs-on: ${{ matrix.runner }}
     steps:
       - name: Check out Server
-        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v4
         with: {path: nostosdb-server}
       - name: Check out Core
-        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v4
         with: {repository: nostosdb/nostosdb-core, path: nostosdb-core}
       - name: Check out CLI
-        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v4
         with: {repository: nostosdb/nostosdb-cli, path: nostosdb-cli}
       - name: Configure target
         run: rustup target add ${{ matrix.target }}
