@@ -1,0 +1,12 @@
+{
+  "name": "@nostosdb/server-linux-arm64-gnu",
+  "version": "0.0.1",
+  "description": "NostosDB database server for GNU/Linux ARM64",
+  "license": "SSPL-1.0",
+  "os": ["linux"],
+  "cpu": ["arm64"],
+  "libc": ["glibc"],
+  "files": ["bin/nostosd", "LICENSE", "NOTICE", "README.md"],
+  "repository": {"type": "git", "url": "git+https://github.com/nostosdb/nostosdb-server.git", "directory": "npm/packages/linux-arm64-gnu"},
+  "publishConfig": {"access": "public"}
+}

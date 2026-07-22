@@ -40,7 +40,7 @@ The server either returns one `hello` event or one typed error and closes the co
   "request_id": 1,
   "type": "hello",
   "protocol_version": 1,
-  "server_version": "0.1.0",
+  "server_version": "0.0.1",
   "role": "admin",
   "max_frame_bytes": 1048576
 }

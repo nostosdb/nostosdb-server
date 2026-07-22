@@ -158,14 +158,14 @@ The first implementation may serialize physical write transactions, but that is 
 The package-manager command targets are explicit and currently unpublished:
 
 ```bash
-# Server plus matching CLI; npm wrapper not implemented yet
+# Server plus matching CLI
 npm install --global @nostosdb/server
 
 # Server plus CLI on macOS
 brew install nostosdb/tap/nostosdb
 ```
 
-Both install surfaces expose `nostosd` and `nostos`. The npm Server package will depend on the exact matching `@nostosdb/cli`; neither path installs a separate `@nostosdb/core` package.
+Both install surfaces expose `nostosd` and `nostos`. The npm Server package depends on the exact matching `@nostosdb/cli`; neither path installs a separate `@nostosdb/core` package. The npm wrapper and its six OS/CPU packages are implemented but unpublished. Installation only places launchers and native binaries; it does not initialize state or start a daemon.
 
 The release target includes the same `nostosd` binary for foreground, native-service, and container execution:
 

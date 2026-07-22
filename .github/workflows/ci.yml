@@ -42,6 +42,18 @@ jobs:
         working-directory: nostosdb-server
         env: {RUSTDOCFLAGS: "-D warnings"}
         run: rustup run ${{ matrix.rust }} cargo doc --all-features --no-deps --locked
+      - name: Configure minimum Node.js
+        uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
+        with: {node-version: "18"}
+      - name: Configure candidate Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with: {python-version: "3.13"}
+      - name: Verify npm Server launcher and platform selection
+        working-directory: nostosdb-server/npm
+        run: npm test && npm run verify && npm pack --dry-run --json
+      - name: Verify npm candidate tooling
+        working-directory: nostosdb-server
+        run: python -B -m unittest discover -s distribution/tests -v
 
   audit:
     runs-on: ubuntu-latest

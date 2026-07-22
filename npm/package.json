@@ -1,0 +1,44 @@
+{
+  "name": "@nostosdb/server",
+  "version": "0.0.1",
+  "description": "Cross-platform launcher for the NostosDB database server and CLI",
+  "license": "SSPL-1.0",
+  "main": "lib/launcher.cjs",
+  "bin": {
+    "nostosd": "bin/nostosd.js",
+    "nostos": "bin/nostos.js"
+  },
+  "files": [
+    "bin",
+    "lib",
+    "LICENSE",
+    "NOTICE",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nostosdb/nostosdb-server.git",
+    "directory": "npm"
+  },
+  "dependencies": {
+    "@nostosdb/cli": "0.0.1"
+  },
+  "optionalDependencies": {
+    "@nostosdb/server-darwin-arm64": "0.0.1",
+    "@nostosdb/server-darwin-x64": "0.0.1",
+    "@nostosdb/server-linux-arm64-gnu": "0.0.1",
+    "@nostosdb/server-linux-x64-gnu": "0.0.1",
+    "@nostosdb/server-win32-arm64": "0.0.1",
+    "@nostosdb/server-win32-x64": "0.0.1"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "test": "node --test tests/launcher.test.cjs tests/platform.test.cjs",
+    "verify": "node scripts/verify-packages.cjs"
+  }
+}

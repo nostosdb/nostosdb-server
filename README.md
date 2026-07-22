@@ -21,7 +21,7 @@ nostosd --version
 nostos --version
 ```
 
-Neither channel is published. The `@nostosdb/server` npm wrapper is also not implemented yet; the native binaries and Homebrew candidate are implemented. CLI-only users install the separate `@nostosdb/cli` package.
+Neither channel is published. The implemented `@nostosdb/server` wrapper selects one exact native Server package, depends on the exact matching `@nostosdb/cli`, contains no lifecycle downloader, and does not initialize or start the daemon during installation. CLI-only users install the separate `@nostosdb/cli` package.
 
 ## Initialize and run `nostosd`
 
@@ -55,6 +55,7 @@ The managed tree uses immutable UUID Database IDs internally and never exposes p
 
 Candidate definitions are under [distribution](distribution/README.md):
 
+- npm wrapper/platform candidates for `@nostosdb/server`, exposing `nostosd` and the exact matching `nostos` CLI;
 - Homebrew formula `nostosdb`, commands `nostos`/`nostosd`, and a per-user service rooted at `~/.nostosdb`;
 - systemd service for `/etc/nostosdb/server.toml` and `/var/lib/nostosdb`;
 - explicit Windows Service registration for `%PROGRAMDATA%\NostosDB\server.toml`;

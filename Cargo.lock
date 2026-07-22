@@ -465,14 +465,14 @@ dependencies = [
 
 [[package]]
 name = "nostos-catalog"
-version = "0.1.0"
+version = "0.0.1"
 dependencies = [
  "nostos-model",
 ]
 
 [[package]]
 name = "nostos-client"
-version = "0.1.0"
+version = "0.0.1"
 dependencies = [
  "serde",
  "serde_json",
@@ -480,7 +480,7 @@ dependencies = [
 
 [[package]]
 name = "nostos-engine"
-version = "0.1.0"
+version = "0.0.1"
 dependencies = [
  "nostos-catalog",
  "nostos-parser",
@@ -492,7 +492,7 @@ dependencies = [
 
 [[package]]
 name = "nostos-model"
-version = "0.1.0"
+version = "0.0.1"
 dependencies = [
  "nostos-parser",
  "nostos-syntax",
@@ -500,14 +500,14 @@ dependencies = [
 
 [[package]]
 name = "nostos-parser"
-version = "0.1.0"
+version = "0.0.1"
 dependencies = [
  "nostos-syntax",
 ]
 
 [[package]]
 name = "nostos-query"
-version = "0.1.0"
+version = "0.0.1"
 dependencies = [
  "nostos-catalog",
  "nostos-model",
@@ -516,7 +516,7 @@ dependencies = [
 
 [[package]]
 name = "nostos-server"
-version = "0.1.0"
+version = "0.0.1"
 dependencies = [
  "axum",
  "base64",
@@ -537,7 +537,7 @@ dependencies = [
 
 [[package]]
 name = "nostos-storage"
-version = "0.1.0"
+version = "0.0.1"
 dependencies = [
  "fs2",
  "nostos-catalog",
@@ -547,7 +547,7 @@ dependencies = [
 
 [[package]]
 name = "nostos-sync"
-version = "0.1.0"
+version = "0.0.1"
 dependencies = [
  "blake3",
  "nostos-catalog",
@@ -560,7 +560,7 @@ dependencies = [
 
 [[package]]
 name = "nostos-syntax"
-version = "0.1.0"
+version = "0.0.1"
 
 [[package]]
 name = "nu-ansi-term"
