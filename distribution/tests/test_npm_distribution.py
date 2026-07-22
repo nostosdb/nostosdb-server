@@ -58,17 +58,9 @@ class NpmDistributionTests(unittest.TestCase):
         self.assertEqual(len(packages), 6)
         self.assertTrue(all(name.startswith("@nostosdb/server-") for name in packages))
 
-    def test_candidate_workflow_covers_manifest_without_publishing(self):
-        manifest = release_manifest()
-        workflow = (ROOT / ".github/workflows/attest-candidate.yml").read_text(
-            encoding="utf-8"
-        )
-        for target, details in manifest["targets"].items():
-            self.assertIn(target, workflow)
-            self.assertIn(details["runner"], workflow)
-        self.assertIn("stage_npm_candidate.py", workflow)
-        self.assertIn("*.tgz", workflow)
-        self.assertNotIn("npm publish", workflow)
+    def test_candidate_scripts_do_not_publish(self):
+        for path in sorted(SCRIPTS.glob("*.py")):
+            self.assertNotIn("npm publish", path.read_text(encoding="utf-8"))
 
     def test_stages_unpublished_launcher_and_native_package(self):
         target = host_target()

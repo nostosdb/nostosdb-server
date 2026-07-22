@@ -177,7 +177,7 @@ Windows:        Windows Service invoking nostosd serve
 Docker:         nostosd serve with a mounted data volume
 ```
 
-The initial release workflow may build candidate artifacts without installing a persistent service. Publication, service registration on a real host, image push, signing, and production credentials require separate authorization.
+The initial release process may build candidate artifacts without installing a persistent service. Publication, service registration on a real host, image push, signing, and production credentials require separate authorization. This repository contains no GitHub Actions.
 
 Target defaults keep platform conventions without making their paths part of Database identity:
 
