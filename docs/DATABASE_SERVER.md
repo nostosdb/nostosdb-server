@@ -157,7 +157,8 @@ The first implementation may serialize physical write transactions, but that is 
 
 ## Installation and service operation
 
-The package-manager command targets are explicit and currently unpublished:
+The package-manager command targets are explicit. npm `0.0.1` is published;
+the Homebrew tap remains unpublished:
 
 ```bash
 # Server plus matching CLI
@@ -167,7 +168,11 @@ npm install --global @nostdb/server
 brew install nostdb/tap/nostdb
 ```
 
-Both install surfaces expose `nostd` and `nostdb`. The npm Server package depends on the exact matching `@nostdb/cli`; neither path installs a separate `@nostdb/core` package. The npm wrapper and its six OS/CPU packages are implemented but unpublished. Installation only places launchers and native binaries; it does not initialize state or start a daemon.
+Both install surfaces expose `nostd` and `nostdb`. The published
+`@nostdb/server@0.0.1` package depends on exact `@nostdb/cli@0.0.1`; neither
+path installs a separate `@nostdb/core` package. The npm wrapper and its six
+OS/CPU packages retain both `latest` and `next`. Installation only places
+launchers and native binaries; it does not initialize state or start a daemon.
 
 The release target includes the same `nostd` binary for foreground, native-service, and container execution:
 

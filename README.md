@@ -2,7 +2,10 @@
 
 Source-available implementation repository for the installable single-node NostDB database daemon, licensed under SSPL-1.0.
 
-Public-preview source only: no supported binary, hosted service, TLS endpoint, production SLA, or external contribution intake exists. Read [PREVIEW.md](PREVIEW.md), [SECURITY.md](SECURITY.md), and [CLA status](CLA.md).
+Unsupported public-preview source and npm binaries are available, but no hosted
+service, TLS endpoint, production SLA, or external contribution intake exists.
+Read [PREVIEW.md](PREVIEW.md), [SECURITY.md](SECURITY.md), and
+[CLA status](CLA.md).
 
 The implemented product path is `nostd`: a long-running process that owns a versioned data directory and catalog, stores one or more named Databases, and accepts connections from the `nostdb` CLI and thin clients. It runs as the same binary in a foreground process, native operating-system service candidate, or Docker container with persistent config and data volumes. Read the [database server contract](docs/DATABASE_SERVER.md) and exact [database protocol](docs/DATABASE_PROTOCOL.md).
 
@@ -10,7 +13,9 @@ The old `nostdb-server` binary still opens one explicit `.ndb` and exposes HTTP 
 
 ## Package-manager targets
 
-The intended global npm package installs the Server and matching CLI together; the Homebrew formula exposes the same two commands on macOS:
+The published global npm package installs the Server and matching CLI together;
+the unpublished Homebrew formula candidate exposes the same two commands on
+macOS:
 
 ```bash
 npm install --global @nostdb/server
@@ -21,7 +26,12 @@ nostd --version
 nostdb --version
 ```
 
-Neither channel is published. The implemented `@nostdb/server` wrapper selects one exact native Server package, depends on the exact matching `@nostdb/cli`, contains no lifecycle downloader, and does not initialize or start the daemon during installation. CLI-only users install the separate `@nostdb/cli` package.
+`@nostdb/server@0.0.1` and its six native packages are published under
+`latest` and `next`; the Homebrew channel is not published. The wrapper selects
+one exact native Server package, depends on the exact matching `@nostdb/cli`,
+contains no lifecycle downloader, and does not initialize or start the daemon
+during installation. CLI-only users install the separate `@nostdb/cli`
+package.
 
 The Homebrew caveat keeps initialization explicit and first creates `~/.nostdb/data`, `config`, and `logs` with mode `0700`; run it as the service user without `sudo`.
 
@@ -93,7 +103,9 @@ Candidate definitions are under [distribution](distribution/README.md):
 - Windows foreground execution; Service Control Manager integration and protected credential ACL installation remain explicitly deferred;
 - [Dockerfile](Dockerfile) and [compose.yaml](compose.yaml) with separate config and authoritative data volumes.
 
-These are unpublished review candidates, not supported installers or registered services.
+The npm `0.0.1` packages are published but unsupported. Homebrew, systemd,
+Windows Service, Docker, and direct-archive material remain unpublished review
+candidates rather than supported installers or registered services.
 
 For the Compose candidate, initialize the named volumes exactly once before starting the server:
 
