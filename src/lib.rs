@@ -1,5 +1,5 @@
 #![forbid(unsafe_code)]
-//! Authenticated single-node HTTP boundary for the Nostos Engine.
+//! Authenticated single-node HTTP boundary for the NostDB Engine.
 
 mod api;
 mod catalog;
@@ -24,7 +24,7 @@ use std::time::Duration;
 use axum::Router;
 use axum::extract::DefaultBodyLimit;
 use axum::middleware;
-use nostos_engine::{EmbeddedDatabase, Parameters, QueryLimits};
+use nostdb_engine::{EmbeddedDatabase, Parameters, QueryLimits};
 use tokio::sync::Mutex as AsyncMutex;
 use tower_http::limit::RequestBodyLimitLayer;
 use tower_http::trace::TraceLayer;
@@ -122,17 +122,17 @@ impl Metrics {
     pub(crate) fn render(&self, active_sessions: usize) -> String {
         format!(
             concat!(
-                "# TYPE nostos_http_requests_total counter\n",
-                "nostos_http_requests_total {}\n",
-                "# TYPE nostos_queries_total counter\n",
-                "nostos_queries_total {}\n",
-                "nostos_query_errors_total {}\n",
-                "nostos_auth_failures_total {}\n",
-                "nostos_query_timeouts_total {}\n",
-                "nostos_sessions_created_total {}\n",
-                "nostos_snapshot_restores_total {}\n",
-                "# TYPE nostos_sessions_active gauge\n",
-                "nostos_sessions_active {}\n"
+                "# TYPE nostdb_http_requests_total counter\n",
+                "nostdb_http_requests_total {}\n",
+                "# TYPE nostdb_queries_total counter\n",
+                "nostdb_queries_total {}\n",
+                "nostdb_query_errors_total {}\n",
+                "nostdb_auth_failures_total {}\n",
+                "nostdb_query_timeouts_total {}\n",
+                "nostdb_sessions_created_total {}\n",
+                "nostdb_snapshot_restores_total {}\n",
+                "# TYPE nostdb_sessions_active gauge\n",
+                "nostdb_sessions_active {}\n"
             ),
             self.requests.load(Ordering::Relaxed),
             self.queries.load(Ordering::Relaxed),

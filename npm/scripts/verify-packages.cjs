@@ -16,7 +16,7 @@ const releaseManifest = JSON.parse(
   ),
 );
 const expectedDirectories = Object.values(PLATFORM_PACKAGES)
-  .map((name) => name.replace("@nostosdb/server-", ""))
+  .map((name) => name.replace("@nostdb/server-", ""))
   .sort();
 const actualDirectories = fs
   .readdirSync(path.join(root, "packages"), { withFileTypes: true })
@@ -25,26 +25,26 @@ const actualDirectories = fs
   .sort();
 
 assert.deepEqual(actualDirectories, expectedDirectories);
-assert.equal(launcher.name, "@nostosdb/server");
+assert.equal(launcher.name, "@nostdb/server");
 assert.equal(launcher.license, "SSPL-1.0");
-assert.equal(launcher.bin.nostosd, "bin/nostosd.js");
-assert.equal(launcher.bin.nostos, "bin/nostos.js");
-assert.deepEqual(launcher.dependencies, { "@nostosdb/cli": launcher.version });
+assert.equal(launcher.bin.nostd, "bin/nostd.js");
+assert.equal(launcher.bin.nostdb, "bin/nostdb.js");
+assert.deepEqual(launcher.dependencies, { "@nostdb/cli": launcher.version });
 assert.equal(launcher.scripts.preinstall, undefined);
 assert.equal(launcher.scripts.install, undefined);
 assert.equal(launcher.scripts.postinstall, undefined);
 assert.equal(launcher.publishConfig.access, "public");
 assert.equal(releaseManifest.version, launcher.version);
-assert.equal(releaseManifest.binary, "nostosd");
+assert.equal(releaseManifest.binary, "nostd");
 assert.equal(
   launcher.repository.url,
-  "git+https://github.com/nostosdb/nostosdb-server.git",
+  "git+https://github.com/nostdb/nostdb-server.git",
 );
 
 for (const directory of actualDirectories) {
   const manifestPath = path.join(root, "packages", directory, "package.json");
   const manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
-  assert.equal(manifest.name, `@nostosdb/server-${directory}`);
+  assert.equal(manifest.name, `@nostdb/server-${directory}`);
   assert.equal(manifest.version, launcher.version);
   assert.equal(launcher.optionalDependencies[manifest.name], launcher.version);
   assert.equal(manifest.license, "SSPL-1.0");
@@ -67,16 +67,16 @@ assert.deepEqual(
 );
 
 const runtimeFiles = [
-  path.join(root, "bin", "nostos.js"),
-  path.join(root, "bin", "nostosd.js"),
+  path.join(root, "bin", "nostdb.js"),
+  path.join(root, "bin", "nostd.js"),
   path.join(root, "lib", "launcher.cjs"),
   path.join(root, "lib", "platform.cjs"),
 ];
 const forbidden = [
   "child_process",
   "sqlite",
-  "nostos-parser",
-  "nostos-storage",
+  "nostdb-parser",
+  "nostdb-storage",
   "writeFileSync",
   "writeFile",
   ".ndb",
@@ -90,5 +90,5 @@ for (const file of runtimeFiles) {
 }
 
 console.log(
-  `verified @nostosdb/server launcher and ${actualDirectories.length} platform manifests`,
+  `verified @nostdb/server launcher and ${actualDirectories.length} platform manifests`,
 );

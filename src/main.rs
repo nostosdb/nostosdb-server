@@ -6,17 +6,17 @@ use std::path::PathBuf;
 use std::process::ExitCode;
 use std::time::Duration;
 
-use nostos_server::{AppState, ServerConfig, router};
+use nostdb_server::{AppState, ServerConfig, router};
 use tracing_subscriber::EnvFilter;
 
-const HELP: &str = "NostosDB single-node server
+const HELP: &str = "NostDB single-node server
 
 Usage:
-    nostos-server --database PATH [--listen ADDRESS] [--api-key KEY]
+    nostdb-server --database PATH [--listen ADDRESS] [--api-key KEY]
                   [--timeout-ms N] [--max-rows N] [--max-memory-bytes N]
                   [--max-operations N] [--max-traversals N]
 
-The API key may instead be supplied through NOSTOS_API_KEY.
+The API key may instead be supplied through NOSTDB_API_KEY.
 The default listen address is 127.0.0.1:7878.";
 
 #[tokio::main]
@@ -24,7 +24,7 @@ async fn main() -> ExitCode {
     match run().await {
         Ok(()) => ExitCode::SUCCESS,
         Err(error) => {
-            eprintln!("nostos-server: {error}");
+            eprintln!("nostdb-server: {error}");
             ExitCode::from(2)
         }
     }
@@ -40,7 +40,7 @@ async fn run() -> Result<(), String> {
     let listener = tokio::net::TcpListener::bind(listen)
         .await
         .map_err(|error| format!("cannot bind {listen}: {error}"))?;
-    tracing::info!(address = %listen, "NostosDB server listening");
+    tracing::info!(address = %listen, "NostDB server listening");
     axum::serve(listener, router(state))
         .with_graceful_shutdown(shutdown_signal())
         .await
@@ -56,7 +56,7 @@ fn parse_arguments() -> Result<Option<(SocketAddr, ServerConfig)>, String> {
         return Ok(None);
     }
     let mut database = None;
-    let mut api_key = env::var("NOSTOS_API_KEY").ok();
+    let mut api_key = env::var("NOSTDB_API_KEY").ok();
     let mut listen = "127.0.0.1:7878".to_owned();
     let mut timeout_ms = None;
     let mut max_rows = None;
@@ -84,7 +84,7 @@ fn parse_arguments() -> Result<Option<(SocketAddr, ServerConfig)>, String> {
         index += 1;
     }
     let database = database.ok_or_else(|| "--database is required".to_owned())?;
-    let api_key = api_key.ok_or_else(|| "--api-key or NOSTOS_API_KEY is required".to_owned())?;
+    let api_key = api_key.ok_or_else(|| "--api-key or NOSTDB_API_KEY is required".to_owned())?;
     let listen = listen
         .parse::<SocketAddr>()
         .map_err(|error| format!("invalid --listen address: {error}"))?;
@@ -110,7 +110,7 @@ fn number(value: &str) -> Result<u64, String> {
 
 fn init_tracing() -> Result<(), String> {
     let filter = EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new("info"));
-    if env::var("NOSTOS_LOG_FORMAT").as_deref() == Ok("json") {
+    if env::var("NOSTDB_LOG_FORMAT").as_deref() == Ok("json") {
         tracing_subscriber::fmt()
             .with_env_filter(filter)
             .json()

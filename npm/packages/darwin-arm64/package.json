@@ -1,11 +1,11 @@
 {
-  "name": "@nostosdb/server-darwin-arm64",
+  "name": "@nostdb/server-darwin-arm64",
   "version": "0.0.1",
-  "description": "NostosDB database server for macOS Apple Silicon",
+  "description": "NostDB database server for macOS Apple Silicon",
   "license": "SSPL-1.0",
   "os": ["darwin"],
   "cpu": ["arm64"],
-  "files": ["bin/nostosd", "LICENSE", "NOTICE", "README.md"],
-  "repository": {"type": "git", "url": "git+https://github.com/nostosdb/nostosdb-server.git", "directory": "npm/packages/darwin-arm64"},
+  "files": ["bin/nostd", "LICENSE", "NOTICE", "README.md"],
+  "repository": {"type": "git", "url": "git+https://github.com/nostdb/nostdb-server.git", "directory": "npm/packages/darwin-arm64"},
   "publishConfig": {"access": "public"}
 }

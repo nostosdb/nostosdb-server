@@ -1,0 +1,54 @@
+# SPDX-License-Identifier: SSPL-1.0
+# Candidate template only. Publication requires separate authorization.
+
+class Nostdb < Formula
+  desc "Source-first property graph database CLI and local service"
+  homepage "https://github.com/nostdb/nostdb-server"
+  version "@VERSION@"
+  license "SSPL-1.0"
+
+  on_arm do
+    url "@ARM64_URL@"
+    sha256 "@ARM64_SHA256@"
+  end
+
+  on_intel do
+    url "@X64_URL@"
+    sha256 "@X64_SHA256@"
+  end
+
+  def install
+    bin.install "nostdb", "nostd"
+  end
+
+  def caveats
+    <<~EOS
+      Initialize per-user state before starting the service:
+        mkdir -p "$HOME/.nostdb/data" "$HOME/.nostdb/config" "$HOME/.nostdb/logs"
+        chmod 700 "$HOME/.nostdb" "$HOME/.nostdb/data" "$HOME/.nostdb/config" "$HOME/.nostdb/logs"
+        #{opt_bin}/nostd init \
+          --data-dir "$HOME/.nostdb/data" \
+          --config "$HOME/.nostdb/config/server.toml" \
+          --listen 127.0.0.1:7878
+        brew services start nostdb
+
+      Initialization is explicit because Homebrew runs post_install with a
+      temporary HOME that is removed after installation.
+    EOS
+  end
+
+  service do
+    nostdb_home = Pathname.new(Dir.home)/".nostdb"
+    run [opt_bin/"nostd", "serve", "--config", (nostdb_home/"config/server.toml").to_s]
+    keep_alive true
+    environment_variables NOSTDB_HOME: nostdb_home.to_s
+    log_path (nostdb_home/"logs/nostd.log").to_s
+    error_log_path (nostdb_home/"logs/nostd.log").to_s
+    working_dir nostdb_home.to_s
+  end
+
+  test do
+    assert_equal "nostdb #{version}", shell_output("#{bin}/nostdb --version").strip
+    assert_equal "nostd #{version}", shell_output("#{bin}/nostd --version").strip
+  end
+end

@@ -6,8 +6,8 @@ use std::net::SocketAddr;
 use std::path::{Path, PathBuf};
 use std::time::Duration;
 
-use nostos_client::ClientRole;
-use nostos_engine::QueryLimits;
+use nostdb_client::ClientRole;
+use nostdb_engine::QueryLimits;
 use serde::{Deserialize, Serialize};
 
 use crate::ServerError;
@@ -15,7 +15,7 @@ use crate::ServerError;
 /// Current version of `server.toml`.
 pub const CONFIG_VERSION: u32 = 1;
 
-/// Complete versioned `nostosd` configuration.
+/// Complete versioned `nostd` configuration.
 #[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct DaemonConfig {
@@ -348,7 +348,7 @@ mod tests {
     #[test]
     fn configuration_round_trips_and_rejects_unknown_versions() {
         let root = std::env::temp_dir().join(format!(
-            "nostos-config-{}-{}",
+            "nostdb-config-{}-{}",
             std::process::id(),
             uuid::Uuid::new_v4()
         ));

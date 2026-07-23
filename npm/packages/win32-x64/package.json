@@ -1,11 +1,11 @@
 {
-  "name": "@nostosdb/server-win32-x64",
+  "name": "@nostdb/server-win32-x64",
   "version": "0.0.1",
-  "description": "NostosDB database server for Windows x64",
+  "description": "NostDB database server for Windows x64",
   "license": "SSPL-1.0",
   "os": ["win32"],
   "cpu": ["x64"],
-  "files": ["bin/nostosd.exe", "LICENSE", "NOTICE", "README.md"],
-  "repository": {"type": "git", "url": "git+https://github.com/nostosdb/nostosdb-server.git", "directory": "npm/packages/win32-x64"},
+  "files": ["bin/nostd.exe", "LICENSE", "NOTICE", "README.md"],
+  "repository": {"type": "git", "url": "git+https://github.com/nostdb/nostdb-server.git", "directory": "npm/packages/win32-x64"},
   "publishConfig": {"access": "public"}
 }

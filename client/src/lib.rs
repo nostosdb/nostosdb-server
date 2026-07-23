@@ -1,6 +1,6 @@
 #![forbid(unsafe_code)]
 #![deny(missing_docs)]
-//! Blocking client and shared wire types for the NostosDB database protocol.
+//! Blocking client and shared wire types for the NostDB database protocol.
 //!
 //! This crate intentionally contains no parser, query engine, or storage code.
 
@@ -63,7 +63,7 @@ pub enum ClientRequest {
     },
     /// Executes or queues one query.
     Query {
-        /// Query text interpreted only by `nostos-engine`.
+        /// Query text interpreted only by `nostdb-engine`.
         query: String,
         /// Named JSON-compatible query parameters.
         #[serde(default)]
@@ -138,7 +138,7 @@ pub enum ClientRequest {
     SnapshotRestoreCommit,
     /// Discards an incomplete snapshot upload.
     SnapshotRestoreAbort,
-    /// Exports the portable logical `.nostos` package.
+    /// Exports the portable logical `.nostdb` package.
     LogicalExport {
         /// Catalog name to export.
         database: String,
@@ -272,7 +272,7 @@ pub enum ServerResponse {
     },
     /// Confirms a logical package import.
     LogicalImported {
-        /// Number of `.nostos` modules imported.
+        /// Number of `.nostdb` modules imported.
         modules: u64,
     },
     /// Stable typed failure. The connection remains usable unless the protocol closes it.
@@ -546,11 +546,11 @@ impl Client {
     }
 }
 
-/// Parses `nostos://HOST:PORT` without accepting paths, credentials, or fragments.
+/// Parses `nostdb://HOST:PORT` without accepting paths, credentials, or fragments.
 pub fn parse_server_address(server: &str) -> Result<String, ClientError> {
     let address = server
-        .strip_prefix("nostos://")
-        .ok_or_else(|| ClientError::Protocol("server address must start with nostos://".into()))?;
+        .strip_prefix("nostdb://")
+        .ok_or_else(|| ClientError::Protocol("server address must start with nostdb://".into()))?;
     if address.is_empty()
         || address.contains(['/', '?', '#', '@'])
         || (!address.starts_with('[') && !address.contains(':'))
@@ -624,13 +624,13 @@ mod tests {
     #[test]
     fn server_address_requires_the_database_scheme_and_no_path() {
         assert_eq!(
-            parse_server_address("nostos://127.0.0.1:7878").expect("address parses"),
+            parse_server_address("nostdb://127.0.0.1:7878").expect("address parses"),
             "127.0.0.1:7878"
         );
         for invalid in [
             "127.0.0.1:7878",
-            "nostos://127.0.0.1:7878/path",
-            "nostos://user@127.0.0.1:7878",
+            "nostdb://127.0.0.1:7878/path",
+            "nostdb://user@127.0.0.1:7878",
         ] {
             assert!(parse_server_address(invalid).is_err(), "{invalid}");
         }

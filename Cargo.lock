@@ -464,14 +464,14 @@ dependencies = [
 ]
 
 [[package]]
-name = "nostos-catalog"
+name = "nostdb-catalog"
 version = "0.0.1"
 dependencies = [
- "nostos-model",
+ "nostdb-model",
 ]
 
 [[package]]
-name = "nostos-client"
+name = "nostdb-client"
 version = "0.0.1"
 dependencies = [
  "serde",
@@ -479,51 +479,51 @@ dependencies = [
 ]
 
 [[package]]
-name = "nostos-engine"
+name = "nostdb-engine"
 version = "0.0.1"
 dependencies = [
- "nostos-catalog",
- "nostos-parser",
- "nostos-query",
- "nostos-storage",
- "nostos-sync",
- "nostos-syntax",
+ "nostdb-catalog",
+ "nostdb-parser",
+ "nostdb-query",
+ "nostdb-storage",
+ "nostdb-sync",
+ "nostdb-syntax",
 ]
 
 [[package]]
-name = "nostos-model"
+name = "nostdb-model"
 version = "0.0.1"
 dependencies = [
- "nostos-parser",
- "nostos-syntax",
+ "nostdb-parser",
+ "nostdb-syntax",
 ]
 
 [[package]]
-name = "nostos-parser"
+name = "nostdb-parser"
 version = "0.0.1"
 dependencies = [
- "nostos-syntax",
+ "nostdb-syntax",
 ]
 
 [[package]]
-name = "nostos-query"
+name = "nostdb-query"
 version = "0.0.1"
 dependencies = [
- "nostos-catalog",
- "nostos-model",
- "nostos-storage",
+ "nostdb-catalog",
+ "nostdb-model",
+ "nostdb-storage",
 ]
 
 [[package]]
-name = "nostos-server"
+name = "nostdb-server"
 version = "0.0.1"
 dependencies = [
  "axum",
  "base64",
  "fs2",
  "futures-util",
- "nostos-client",
- "nostos-engine",
+ "nostdb-client",
+ "nostdb-engine",
  "serde",
  "serde_json",
  "tokio",
@@ -536,30 +536,30 @@ dependencies = [
 ]
 
 [[package]]
-name = "nostos-storage"
+name = "nostdb-storage"
 version = "0.0.1"
 dependencies = [
  "fs2",
- "nostos-catalog",
- "nostos-model",
+ "nostdb-catalog",
+ "nostdb-model",
  "rusqlite",
 ]
 
 [[package]]
-name = "nostos-sync"
+name = "nostdb-sync"
 version = "0.0.1"
 dependencies = [
  "blake3",
- "nostos-catalog",
- "nostos-model",
- "nostos-parser",
- "nostos-storage",
- "nostos-syntax",
+ "nostdb-catalog",
+ "nostdb-model",
+ "nostdb-parser",
+ "nostdb-storage",
+ "nostdb-syntax",
  "toml",
 ]
 
 [[package]]
-name = "nostos-syntax"
+name = "nostdb-syntax"
 version = "0.0.1"
 
 [[package]]

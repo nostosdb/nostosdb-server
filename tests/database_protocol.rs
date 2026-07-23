@@ -5,12 +5,12 @@ use std::path::{Path, PathBuf};
 
 use base64::Engine;
 use base64::engine::general_purpose::STANDARD as BASE64;
-use nostos_client::{
+use nostdb_client::{
     Client, ClientError, ClientFrame, ClientRequest, ErrorCode, ServerFrame, ServerResponse,
     WireQueryLimits, read_frame, write_frame,
 };
-use nostos_server::config::DaemonConfig;
-use nostos_server::daemon::DatabaseDaemon;
+use nostdb_server::config::DaemonConfig;
+use nostdb_server::daemon::DatabaseDaemon;
 use serde_json::{Value, json};
 use tokio::sync::oneshot;
 
@@ -24,7 +24,7 @@ struct Installation {
 impl Installation {
     fn new(name: &str) -> Self {
         let root = std::env::temp_dir().join(format!(
-            "nostos-daemon-{name}-{}-{}",
+            "nostdb-daemon-{name}-{}-{}",
             std::process::id(),
             uuid::Uuid::new_v4()
         ));
@@ -52,13 +52,13 @@ impl Installation {
         let address = listener.local_addr().expect("listener address reads");
         let (shutdown, receiver) = oneshot::channel();
         let task = tokio::spawn(async move {
-            nostos_server::serve_database_protocol(listener, daemon, async {
+            nostdb_server::serve_database_protocol(listener, daemon, async {
                 let _ = receiver.await;
             })
             .await
         });
         RunningDaemon {
-            address: format!("nostos://{address}"),
+            address: format!("nostdb://{address}"),
             shutdown: Some(shutdown),
             task,
         }
@@ -78,7 +78,7 @@ impl Drop for Installation {
 struct RunningDaemon {
     address: String,
     shutdown: Option<oneshot::Sender<()>>,
-    task: tokio::task::JoinHandle<Result<(), nostos_server::ServerError>>,
+    task: tokio::task::JoinHandle<Result<(), nostdb_server::ServerError>>,
 }
 
 impl RunningDaemon {
@@ -193,7 +193,7 @@ async fn protocol_negotiates_authenticates_streams_transacts_cancels_and_limits(
 
     let socket_address = running
         .address
-        .strip_prefix("nostos://")
+        .strip_prefix("nostdb://")
         .expect("test address has scheme");
     let mut raw = TcpStream::connect(socket_address).expect("raw client connects");
     write_frame(
@@ -639,7 +639,7 @@ async fn named_databases_survive_restart_snapshot_logical_import_and_exclusive_o
         .join("databases")
         .join(&first.id)
         .join("database.ndb");
-    let direct = match nostos_engine::EmbeddedDatabase::open(&managed_path) {
+    let direct = match nostdb_engine::EmbeddedDatabase::open(&managed_path) {
         Ok(_) => panic!("Embedded Mode opened daemon-owned storage"),
         Err(error) => error,
     };
@@ -766,7 +766,7 @@ fn restore_snapshot(client: &mut Client, database: &str, bytes: &[u8]) {
         },
     );
     for (sequence, chunk) in bytes
-        .chunks(nostos_client::SNAPSHOT_CHUNK_BYTES)
+        .chunks(nostdb_client::SNAPSHOT_CHUNK_BYTES)
         .enumerate()
     {
         request(

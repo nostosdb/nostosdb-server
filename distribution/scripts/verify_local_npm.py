@@ -69,7 +69,7 @@ def main() -> int:
         cli_script = cli_root / "distribution" / "scripts" / "stage_npm_candidate.py"
         if not cli_script.is_file():
             raise CandidateError("CLI npm candidate script is missing")
-        with tempfile.TemporaryDirectory(prefix="nostosdb-server-npm-install-") as temporary:
+        with tempfile.TemporaryDirectory(prefix="nostdb-server-npm-install-") as temporary:
             root = Path(temporary)
             cache = root / "cache"
             environment = dict(os.environ)
@@ -114,8 +114,8 @@ def main() -> int:
                 env=environment,
             )
             expected = {
-                "nostos": "nostos {}".format(version),
-                "nostosd": "nostosd {}".format(version),
+                "nostdb": "nostdb {}".format(version),
+                "nostd": "nostd {}".format(version),
             }
             for command, version_line in expected.items():
                 executable = command_path(prefix, command)
@@ -144,28 +144,28 @@ def main() -> int:
             )
             installed = tree.get("dependencies", {})
             for package in (
-                "@nostosdb/cli",
+                "@nostdb/cli",
                 cli["platform"]["name"],
-                "@nostosdb/server",
+                "@nostdb/server",
                 server["platform"]["name"],
             ):
                 if installed.get(package, {}).get("version") != version:
                     raise CandidateError("global package version mismatch: {}".format(package))
-            server_dependencies = installed["@nostosdb/server"].get("dependencies", {})
-            if server_dependencies.get("@nostosdb/cli", {}).get("version") != version:
+            server_dependencies = installed["@nostdb/server"].get("dependencies", {})
+            if server_dependencies.get("@nostdb/cli", {}).get("version") != version:
                 raise CandidateError("Server did not deduplicate the exact CLI dependency")
             if (
                 server_dependencies.get(server["platform"]["name"], {}).get("version")
                 != version
             ):
                 raise CandidateError("Server did not select the exact native dependency")
-            cli_dependencies = installed["@nostosdb/cli"].get("dependencies", {})
+            cli_dependencies = installed["@nostdb/cli"].get("dependencies", {})
             if cli_dependencies.get(cli["platform"]["name"], {}).get("version") != version:
                 raise CandidateError("CLI did not select the exact native dependency")
         print(
             json.dumps(
                 {
-                    "commands": ["nostos", "nostosd"],
+                    "commands": ["nostdb", "nostd"],
                     "installed_packages": 4,
                     "passed": True,
                     "published": False,
@@ -177,7 +177,7 @@ def main() -> int:
         )
         return 0
     except (CandidateError, OSError, ValueError, subprocess.SubprocessError) as error:
-        print("nostosdb-server-npm-local: {}".format(error), file=sys.stderr)
+        print("nostdb-server-npm-local: {}".format(error), file=sys.stderr)
         return 1
 
 

@@ -5,7 +5,7 @@ use std::time::Duration;
 use axum::Router;
 use axum::body::{Body, to_bytes};
 use axum::http::{Request, StatusCode, header};
-use nostos_server::{AppState, ServerConfig, router};
+use nostdb_server::{AppState, ServerConfig, router};
 use serde_json::{Value, json};
 use tower::ServiceExt;
 
@@ -21,7 +21,7 @@ struct TestServer {
 impl TestServer {
     fn new(name: &str, configure: impl FnOnce(&mut ServerConfig)) -> Self {
         let directory = std::env::temp_dir().join(format!(
-            "nostos-server-{name}-{}-{}",
+            "nostdb-server-{name}-{}-{}",
             std::process::id(),
             SEQUENCE.fetch_add(1, Ordering::Relaxed)
         ));
@@ -132,7 +132,7 @@ async fn health_is_public_but_every_operational_endpoint_requires_authentication
     assert!(
         String::from_utf8(metrics.body)
             .expect("metrics are UTF-8")
-            .contains("nostos_auth_failures_total 3")
+            .contains("nostdb_auth_failures_total 3")
     );
 }
 
@@ -467,7 +467,7 @@ async fn snapshot_restore_validates_compatibility_before_replacing_live_database
     assert_eq!(exported.status, StatusCode::OK);
     assert_eq!(
         exported.content_type.as_deref(),
-        Some("application/vnd.nostos.ndb")
+        Some("application/vnd.nostdb.ndb")
     );
 
     let incompatible = server
@@ -546,7 +546,7 @@ async fn snapshot_restore_validates_compatibility_before_replacing_live_database
     assert_names(&server, &["Before"]).await;
 
     let mut unsafe_package = package;
-    unsafe_package["modules"][0]["path"] = json!("../outside.nostos");
+    unsafe_package["modules"][0]["path"] = json!("../outside.nostdb");
     let rejected = server
         .request(
             "PUT",
@@ -563,7 +563,7 @@ async fn snapshot_restore_validates_compatibility_before_replacing_live_database
                 .expect("server directory entry reads")
                 .file_name()
                 .to_string_lossy()
-                .starts_with(".nostos-logical-import-"))
+                .starts_with(".nostdb-logical-import-"))
     );
 }
 

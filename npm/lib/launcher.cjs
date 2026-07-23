@@ -22,33 +22,33 @@ function resolveCliLauncher({
 }) {
   let manifestPath;
   try {
-    manifestPath = resolvePackage("@nostosdb/cli/package.json");
+    manifestPath = resolvePackage("@nostdb/cli/package.json");
   } catch (error) {
     throw new LauncherError(
-      `missing @nostosdb/cli@${version}; reinstall @nostosdb/server@${version}`,
+      `missing @nostdb/cli@${version}; reinstall @nostdb/server@${version}`,
       { cause: error },
     );
   }
   const manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
-  if (manifest.name !== "@nostosdb/cli" || manifest.version !== version) {
+  if (manifest.name !== "@nostdb/cli" || manifest.version !== version) {
     throw new LauncherError(
-      `CLI package mismatch: expected @nostosdb/cli@${version}, ` +
+      `CLI package mismatch: expected @nostdb/cli@${version}, ` +
         `found ${manifest.name}@${manifest.version}`,
     );
   }
-  const launcher = loadPackage("@nostosdb/cli");
+  const launcher = loadPackage("@nostdb/cli");
   if (
     !launcher ||
     typeof launcher.launchBinary !== "function" ||
     typeof launcher.run !== "function"
   ) {
-    throw new LauncherError("@nostosdb/cli does not expose the required launcher API");
+    throw new LauncherError("@nostdb/cli does not expose the required launcher API");
   }
   return launcher;
 }
 
 function reportFailure(error) {
-  console.error(`nostosdb server launcher: ${error.message}`);
+  console.error(`nostdb server launcher: ${error.message}`);
   process.exitCode = 3;
   return null;
 }

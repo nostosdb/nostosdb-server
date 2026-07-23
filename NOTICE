@@ -1,14 +1,17 @@
-nostosdb-server
+nostdb-server
+
+Copyright 2026 Jongho Yoo.
 
 Licensed under the Server Side Public License, Version 1 (SSPL-1.0).
-No final copyright holder or contribution entity has been legally approved.
-External contributions and distribution releases remain closed.
+Jongho Yoo, an individual in the United States, is the copyright holder for the
+original project material. External contributions are not accepted, and
+distribution releases remain closed pending legal review.
 
 This software uses third-party Rust crates under permissive licenses, including:
 
 - Tokio, Axum, Tower HTTP, tracing, tracing-subscriber, and UUID under MIT terms.
 - Serde, serde_json, and futures utilities under MIT or Apache-2.0 terms.
-- rusqlite/libsqlite3-sys and their transitive dependencies through nostos-engine;
+- rusqlite/libsqlite3-sys and their transitive dependencies through nostdb-engine;
   bundled SQLite is in the public domain and the Rust bindings use permissive terms.
 
 Exact per-package license texts/SBOM and final attribution/legal review remain

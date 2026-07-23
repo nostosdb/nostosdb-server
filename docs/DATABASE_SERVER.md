@@ -1,48 +1,48 @@
-# NostosDB database server contract
+# NostDB database server contract
 
 Status: Implemented source-preview architecture; release, production hardening, and cross-platform service evidence remain gated.
 
 ## Product definition
 
-`nostosd` is an installable, long-running, single-node database server. It owns one data directory, stores and recovers one or more named Nostos databases, and accepts connections from the `nostos` CLI, official drivers, and thin adapters such as MCP.
+`nostd` is an installable, long-running, single-node database server. It owns one data directory, stores and recovers one or more named NostDB databases, and accepts connections from the `nostdb` CLI, official drivers, and thin adapters such as MCP.
 
-It is not an application REST API server. Applications do not integrate by opening `.ndb` files or by depending on resource-oriented HTTP endpoints. They connect through the versioned NostosDB database protocol and select a logical Database name.
+It is not an application REST API server. Applications do not integrate by opening `.ndb` files or by depending on resource-oriented HTTP endpoints. They connect through the versioned NostDB database protocol and select a logical Database name.
 
-The repository is named `nostosdb-server`; the daemon executable is `nostosd` so service managers and operators can distinguish it from the `nostos` client.
+The repository is named `nostdb-server`; the daemon executable is `nostd` so service managers and operators can distinguish it from the `nostdb` client.
 
 ## Deployment modes
 
-NostosDB retains two local execution choices:
+NostDB retains two local execution choices:
 
 | Mode | Process owning `.ndb` | Client address | Intended use |
 |---|---|---|---|
-| Embedded | Current `nostos` process | Filesystem path | Local scripts, Source Mode, single-process applications |
-| Server | Long-running `nostosd` | Server address plus Database name | Shared local service, containers, multiple clients, remote applications |
+| Embedded | Current `nostdb` process | Filesystem path | Local scripts, Source Mode, single-process applications |
+| Server | Long-running `nostd` | Server address plus Database name | Shared local service, containers, multiple clients, remote applications |
 
-In Server Mode, only `nostosd` may open or mutate the managed `.ndb` files. A CLI, driver, Skill, MCP adapter, backup tool, or application must use the database protocol or an explicit offline administration workflow while the daemon is stopped.
+In Server Mode, only `nostd` may open or mutate the managed `.ndb` files. A CLI, driver, Skill, MCP adapter, backup tool, or application must use the database protocol or an explicit offline administration workflow while the daemon is stopped.
 
 ## Operator surface
 
 The implemented command surface is:
 
 ```bash
-nostosd init --data-dir /var/lib/nostosdb
-nostosd serve --config /etc/nostosdb/server.toml
+nostd init --data-dir /var/lib/nostdb
+nostd serve --config /etc/nostdb/server.toml
 
-nostos server ping --server nostos://127.0.0.1:7878 \
-  --credential-file /var/lib/nostosdb/credentials/client.token
-nostos database create knowledge --server nostos://127.0.0.1:7878 \
-  --credential-file /var/lib/nostosdb/credentials/admin.token
-nostos database list --server nostos://127.0.0.1:7878 \
-  --credential-file /var/lib/nostosdb/credentials/client.token
-nostos query --server nostos://127.0.0.1:7878 --database knowledge \
-  --credential-file /var/lib/nostosdb/credentials/client.token \
+nostdb server ping --server nostdb://127.0.0.1:7878 \
+  --credential-file /var/lib/nostdb/credentials/client.token
+nostdb database create knowledge --server nostdb://127.0.0.1:7878 \
+  --credential-file /var/lib/nostdb/credentials/admin.token
+nostdb database list --server nostdb://127.0.0.1:7878 \
+  --credential-file /var/lib/nostdb/credentials/client.token
+nostdb query --server nostdb://127.0.0.1:7878 --database knowledge \
+  --credential-file /var/lib/nostdb/credentials/client.token \
   'MATCH (n) RETURN n LIMIT 100'
 ```
 
 The `/var/lib` example assumes the daemon service identity owns the data tree. For the systemd candidate, do not initialize as `root` and leave root-owned `0600` credentials; follow the service-user procedure under `distribution/systemd`.
 
-The CLI remains the primary interactive and administrative client, analogous to `psql`. `nostosd` does not include an interactive shell.
+The CLI remains the primary interactive and administrative client, analogous to `psql`. `nostd` does not include an interactive shell.
 
 Commands that delete a Database, replace a snapshot, change authority, or rotate credentials require explicit operator intent and must not be inferred from project discovery.
 
@@ -80,14 +80,14 @@ Server configuration and stored catalog metadata are separate versioned formats.
 
 ```toml
 config_version = 1
-data_directory = "/var/lib/nostosdb"
+data_directory = "/var/lib/nostdb"
 
 [network]
 listen = "127.0.0.1:7878"
 
 [authentication]
-query_credential_file = "/var/lib/nostosdb/credentials/client.token"
-admin_credential_file = "/var/lib/nostosdb/credentials/admin.token"
+query_credential_file = "/var/lib/nostdb/credentials/client.token"
+admin_credential_file = "/var/lib/nostdb/credentials/admin.token"
 
 [limits]
 max_connections = 256
@@ -120,11 +120,11 @@ The public network surface is a stateful, versioned database connection protocol
 - administrative capabilities separated from ordinary query permission;
 - liveness/readiness without exposing catalog or data.
 
-The protocol version remains independent from the `.nostos` language version, `.ndb` format version, server catalog version, and binary package version.
+The protocol version remains independent from the `.nostdb` language version, `.ndb` format version, server catalog version, and binary package version.
 
 Exact version 1 framing, connection state, messages, roles, and errors are specified in [DATABASE_PROTOCOL.md](DATABASE_PROTOCOL.md). The current HTTP protocol version 1 is a transitional evaluation transport used by existing tests and MCP. It is not the product identity and creates no compatibility relationship with database protocol version 1. The legacy HTTP binary remains an optional compatibility adapter and does not define new database semantics.
 
-All query classification, planning, execution, transactions, validation, and storage behavior continue to come from public `nostos-engine` APIs. The daemon and protocol adapter must not implement a second query engine or `.ndb` writer.
+All query classification, planning, execution, transactions, validation, and storage behavior continue to come from public `nostdb-engine` APIs. The daemon and protocol adapter must not implement a second query engine or `.ndb` writer.
 
 ## Database lifecycle
 
@@ -133,7 +133,7 @@ The daemon owns these lifecycle operations:
 - create and list named Databases;
 - report Database health, format, generation, checksum, and authority;
 - rename a Database without changing its stable ID;
-- import a logical `.nostos` package through an isolated synchronization candidate;
+- import a logical `.nostdb` package through an isolated synchronization candidate;
 - restore an exact-compatible physical snapshot after isolated integrity validation;
 - create a consistent snapshot without exposing live mutable files;
 - close, migrate, and reopen a Database with rollback on failure;
@@ -143,7 +143,7 @@ Physical snapshot restore and logical import remain different capabilities. A sn
 
 ## Concurrency and recovery
 
-`nostosd` provides the process boundary for multiple clients. It must preserve:
+`nostd` provides the process boundary for multiple clients. It must preserve:
 
 - transaction isolation and all-or-nothing commit;
 - cancellation and resource-limit rollback;
@@ -161,22 +161,22 @@ The package-manager command targets are explicit and currently unpublished:
 
 ```bash
 # Server plus matching CLI
-npm install --global @nostosdb/server
+npm install --global @nostdb/server
 
 # Server plus CLI on macOS
-brew install nostosdb/tap/nostosdb
+brew install nostdb/tap/nostdb
 ```
 
-Both install surfaces expose `nostosd` and `nostos`. The npm Server package depends on the exact matching `@nostosdb/cli`; neither path installs a separate `@nostosdb/core` package. The npm wrapper and its six OS/CPU packages are implemented but unpublished. Installation only places launchers and native binaries; it does not initialize state or start a daemon.
+Both install surfaces expose `nostd` and `nostdb`. The npm Server package depends on the exact matching `@nostdb/cli`; neither path installs a separate `@nostdb/core` package. The npm wrapper and its six OS/CPU packages are implemented but unpublished. Installation only places launchers and native binaries; it does not initialize state or start a daemon.
 
-The release target includes the same `nostosd` binary for foreground, native-service, and container execution:
+The release target includes the same `nostd` binary for foreground, native-service, and container execution:
 
 ```text
-Direct archive: nostos, nostosd, licenses, notices, checksums
-Homebrew:       brew services start nostosdb
-Linux:          systemd unit invoking nostosd serve
-Windows:        foreground nostosd serve (Service Control Manager host deferred)
-Docker:         nostosd serve with a mounted data volume
+Direct archive: nostdb, nostd, licenses, notices, checksums
+Homebrew:       brew services start nostdb
+Linux:          systemd unit invoking nostd serve
+Windows:        foreground nostd serve (Service Control Manager host deferred)
+Docker:         nostd serve with a mounted data volume
 ```
 
 The initial release process may build candidate artifacts without installing a persistent service. Publication, service registration on a real host, image push, signing, and production credentials require separate authorization. This repository contains no GitHub Actions.
@@ -185,34 +185,34 @@ Target defaults keep platform conventions without making their paths part of Dat
 
 | Environment | Configuration | Data directory | Service form |
 |---|---|---|---|
-| Homebrew macOS | `~/.nostosdb/config/server.toml` | `~/.nostosdb/data` | per-user `nostosdb` Homebrew service; logs in `~/.nostosdb/logs` |
-| Linux system package | `/etc/nostosdb/server.toml` | `/var/lib/nostosdb` | systemd unit with a dedicated account |
-| Windows source preview | `%PROGRAMDATA%\\NostosDB\\server.toml` | `%PROGRAMDATA%\\NostosDB\\data` | Foreground console process; Service Control Manager integration is not implemented |
-| Docker | `/etc/nostosdb/server.toml` | `/var/lib/nostosdb` | foreground PID 1 with a named volume |
+| Homebrew macOS | `~/.nostdb/config/server.toml` | `~/.nostdb/data` | per-user `nostdb` Homebrew service; logs in `~/.nostdb/logs` |
+| Linux system package | `/etc/nostdb/server.toml` | `/var/lib/nostdb` | systemd unit with a dedicated account |
+| Windows source preview | `%PROGRAMDATA%\\NostDB\\server.toml` | `%PROGRAMDATA%\\NostDB\\data` | Foreground console process; Service Control Manager integration is not implemented |
+| Docker | `/etc/nostdb/server.toml` | `/var/lib/nostdb` | foreground PID 1 with a named volume |
 | Direct developer run | explicit `--config` | explicit initialized directory | foreground process |
 
 Every default is overridable through explicit installation/configuration. The daemon records normalized paths only as local operational state; protocol clients see stable Database IDs and names.
 
-`nostosd` resolves an omitted `--config` in this order: `NOSTOS_CONFIG`, `NOSTOS_HOME/config/server.toml`, then the platform default above. The Homebrew service sets `NOSTOS_HOME` to the installing user's `~/.nostosdb` and should be run without `sudo`. Homebrew's package and service name is `nostosdb`; the executable names remain `nostos` and `nostosd`.
+`nostd` resolves an omitted `--config` in this order: `NOSTDB_CONFIG`, `NOSTDB_HOME/config/server.toml`, then the platform default above. The Homebrew service sets `NOSTDB_HOME` to the installing user's `~/.nostdb` and should be run without `sudo`. Homebrew's package and service name is `nostdb`; the executable names remain `nostdb` and `nostd`.
 
-The Linux systemd candidate must be initialized once as its `nostosdb` service account. The exact [systemd initialization procedure](../distribution/systemd/README.md) creates `/etc/nostosdb` and `/var/lib/nostosdb` with deliberate ownership, runs `nostosd init` as `nostosdb`, then makes only `server.toml` root-owned and group-readable. This preserves service access to the generated `0600` credentials while preventing the daemon from rewriting its configuration.
+The Linux systemd candidate must be initialized once as its `nostdb` service account. The exact [systemd initialization procedure](../distribution/systemd/README.md) creates `/etc/nostdb` and `/var/lib/nostdb` with deliberate ownership, runs `nostd init` as `nostdb`, then makes only `server.toml` root-owned and group-readable. This preserves service access to the generated `0600` credentials while preventing the daemon from rewriting its configuration.
 
-The Docker contract mounts separate configuration and authoritative data volumes. The unpublished local candidate is initialized once, then its default `nostosd serve --config /etc/nostosdb/server.toml` command runs as PID 1:
+The Docker contract mounts separate configuration and authoritative data volumes. The unpublished local candidate is initialized once, then its default `nostd serve --config /etc/nostdb/server.toml` command runs as PID 1:
 
 ```bash
-docker volume create nostos-config
-docker volume create nostos-data
+docker volume create nostdb-config
+docker volume create nostdb-data
 docker run --rm \
-  -v nostos-config:/etc/nostosdb \
-  -v nostos-data:/var/lib/nostosdb \
+  -v nostdb-config:/etc/nostdb \
+  -v nostdb-data:/var/lib/nostdb \
   <local-image> init \
-  --data-dir /var/lib/nostosdb \
-  --config /etc/nostosdb/server.toml \
+  --data-dir /var/lib/nostdb \
+  --config /etc/nostdb/server.toml \
   --listen 0.0.0.0:7878
-docker run --name nostosdb \
+docker run --name nostdb \
   -p 127.0.0.1:7878:7878 \
-  -v nostos-config:/etc/nostosdb \
-  -v nostos-data:/var/lib/nostosdb \
+  -v nostdb-config:/etc/nostdb \
+  -v nostdb-data:/var/lib/nostdb \
   <local-image>
 ```
 
@@ -233,7 +233,7 @@ The equivalent unpublished Compose candidate is `compose.yaml`. No image is curr
 
 The database-daemon Stage is complete only when evidence proves:
 
-1. A fresh native installation can initialize a data directory, start `nostosd`, create a named Database, connect with `nostos`, write/query it, restart the daemon, and observe the committed data.
+1. A fresh native installation can initialize a data directory, start `nostd`, create a named Database, connect with `nostdb`, write/query it, restart the daemon, and observe the committed data.
 2. A Docker candidate performs the same lifecycle with authoritative data on a mounted volume and preserves it across container replacement.
 3. At least two named Databases remain isolated across concurrent clients, restart, snapshot, and restore operations.
 4. Managed `.ndb` files are exclusively daemon-owned while running; direct or second-daemon opens fail safely.

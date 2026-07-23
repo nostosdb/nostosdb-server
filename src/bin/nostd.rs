@@ -4,28 +4,28 @@ use std::env;
 use std::path::{Path, PathBuf};
 use std::process::ExitCode;
 
-use nostos_server::config::DaemonConfig;
-use nostos_server::daemon::DatabaseDaemon;
+use nostdb_server::config::DaemonConfig;
+use nostdb_server::daemon::DatabaseDaemon;
 use tracing_subscriber::EnvFilter;
 
-const HELP: &str = "NostosDB installable database daemon
+const HELP: &str = "NostDB installable database daemon
 
 Usage:
-    nostosd init --data-dir PATH [--config PATH] [--listen IP:PORT]
-    nostosd serve [--config PATH]
-    nostosd --help
-    nostosd --version
+    nostd init --data-dir PATH [--config PATH] [--listen IP:PORT]
+    nostd serve [--config PATH]
+    nostd --help
+    nostd --version
 
 Initialization creates separate protected client and admin credential files.
 Credential values are never accepted as command-line arguments.
-Configuration lookup is --config, NOSTOS_CONFIG, NOSTOS_HOME/config/server.toml,
+Configuration lookup is --config, NOSTDB_CONFIG, NOSTDB_HOME/config/server.toml,
 then the platform default.
 The default database-protocol listener is 127.0.0.1:7878.";
 
-const INIT_HELP: &str = "Initialize a fresh NostosDB daemon installation
+const INIT_HELP: &str = "Initialize a fresh NostDB daemon installation
 
 Usage:
-    nostosd init --data-dir PATH [--config PATH] [--listen IP:PORT]
+    nostd init --data-dir PATH [--config PATH] [--listen IP:PORT]
 
 Options:
     --data-dir PATH   Required fresh or empty daemon-owned data directory
@@ -35,10 +35,10 @@ Options:
 
 Initialization never adopts existing data and never replaces an existing config.";
 
-const SERVE_HELP: &str = "Run the NostosDB database daemon in the foreground
+const SERVE_HELP: &str = "Run the NostDB database daemon in the foreground
 
 Usage:
-    nostosd serve [--config PATH]
+    nostd serve [--config PATH]
 
 Options:
     --config PATH  Existing configuration file; defaults to the platform lookup path
@@ -51,7 +51,7 @@ async fn main() -> ExitCode {
     match run().await {
         Ok(()) => ExitCode::SUCCESS,
         Err(error) => {
-            eprintln!("nostosd: {error}");
+            eprintln!("nostd: {error}");
             ExitCode::from(2)
         }
     }
@@ -67,7 +67,7 @@ async fn run() -> Result<(), String> {
         if arguments.len() != 1 {
             return Err("--version does not accept arguments".to_owned());
         }
-        println!("nostosd {}", env!("CARGO_PKG_VERSION"));
+        println!("nostd {}", env!("CARGO_PKG_VERSION"));
         return Ok(());
     }
     let command = arguments.remove(0);
@@ -152,7 +152,7 @@ fn initialize(options: InitOptions) -> Result<(), String> {
         &options.listen,
     )
     .map_err(|error| error.to_string())?;
-    println!("initialized NostosDB data directory");
+    println!("initialized NostDB data directory");
     println!("config: {}", report.config_path.display());
     println!("data: {}", report.data_directory.display());
     println!(
@@ -174,27 +174,27 @@ async fn serve(config_path: PathBuf) -> Result<(), String> {
     let listener = tokio::net::TcpListener::bind(listen)
         .await
         .map_err(|error| format!("cannot bind database protocol listener {listen}: {error}"))?;
-    tracing::info!(address = %listen, data_directory = %daemon.config().data_directory.display(), "NostosDB database daemon listening");
-    nostos_server::serve_database_protocol(listener, daemon, shutdown_signal())
+    tracing::info!(address = %listen, data_directory = %daemon.config().data_directory.display(), "NostDB database daemon listening");
+    nostdb_server::serve_database_protocol(listener, daemon, shutdown_signal())
         .await
         .map_err(|error| error.to_string())
 }
 
 fn default_config_path() -> PathBuf {
     select_default_config_path(
-        environment_path("NOSTOS_CONFIG"),
-        environment_path("NOSTOS_HOME"),
+        environment_path("NOSTDB_CONFIG"),
+        environment_path("NOSTDB_HOME"),
         platform_default_config_path(),
     )
 }
 
 fn select_default_config_path(
     config_path: Option<PathBuf>,
-    nostos_home: Option<PathBuf>,
+    nostdb_home: Option<PathBuf>,
     platform_default: PathBuf,
 ) -> PathBuf {
     config_path
-        .or_else(|| nostos_home.map(|path| path.join("config/server.toml")))
+        .or_else(|| nostdb_home.map(|path| path.join("config/server.toml")))
         .unwrap_or(platform_default)
 }
 
@@ -207,15 +207,15 @@ fn environment_path(name: &str) -> Option<PathBuf> {
 fn platform_default_config_path() -> PathBuf {
     #[cfg(windows)]
     if let Some(program_data) = environment_path("PROGRAMDATA") {
-        return program_data.join("NostosDB/server.toml");
+        return program_data.join("NostDB/server.toml");
     }
     #[cfg(target_os = "macos")]
     if let Some(home) = environment_path("HOME") {
-        return home.join(".nostosdb/config/server.toml");
+        return home.join(".nostdb/config/server.toml");
     }
     #[cfg(target_os = "linux")]
     {
-        return PathBuf::from("/etc/nostosdb/server.toml");
+        return PathBuf::from("/etc/nostdb/server.toml");
     }
     #[allow(unreachable_code)]
     env::current_dir()
@@ -225,7 +225,7 @@ fn platform_default_config_path() -> PathBuf {
 
 fn init_tracing() -> Result<(), String> {
     let filter = EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new("info"));
-    if env::var("NOSTOS_LOG_FORMAT").as_deref() == Ok("json") {
+    if env::var("NOSTDB_LOG_FORMAT").as_deref() == Ok("json") {
         tracing_subscriber::fmt()
             .with_env_filter(filter)
             .json()
@@ -280,11 +280,11 @@ mod tests {
     use std::path::PathBuf;
 
     #[test]
-    fn config_environment_has_priority_over_nostos_home() {
+    fn config_environment_has_priority_over_nostdb_home() {
         assert_eq!(
             select_default_config_path(
                 Some(PathBuf::from("/explicit/server.toml")),
-                Some(PathBuf::from("/user/.nostosdb")),
+                Some(PathBuf::from("/user/.nostdb")),
                 PathBuf::from("/platform/server.toml"),
             ),
             PathBuf::from("/explicit/server.toml")
@@ -292,14 +292,14 @@ mod tests {
     }
 
     #[test]
-    fn nostos_home_contains_the_default_config_directory() {
+    fn nostdb_home_contains_the_default_config_directory() {
         assert_eq!(
             select_default_config_path(
                 None,
-                Some(PathBuf::from("/user/.nostosdb")),
+                Some(PathBuf::from("/user/.nostdb")),
                 PathBuf::from("/platform/server.toml"),
             ),
-            PathBuf::from("/user/.nostosdb/config/server.toml")
+            PathBuf::from("/user/.nostdb/config/server.toml")
         );
     }
 }

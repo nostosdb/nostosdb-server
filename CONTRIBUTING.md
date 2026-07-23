@@ -1,5 +1,12 @@
-# Contributing to nostosdb-server
+# Contribution policy for nostdb-server
 
-The Server source is available for evaluation, but external contributions are closed pending legal/CLA approval. Do not submit patches or pull requests expecting inclusion; [CLA.md](CLA.md) is status only.
+The Server source is available for evaluation, but external contributions are
+not accepted. This is the repository's operating model, not a temporary legal
+hold. Do not submit patches or pull requests expecting review or inclusion.
 
-Use [SECURITY.md](SECURITY.md) for vulnerabilities. Prospective contributors can run [README verification](README.md#verify). When intake opens, changes must keep authentication on all non-liveness endpoints, delegate semantics to Engine, enforce cooperative limits, preserve rollback, and verify imports before installation.
+Use [SECURITY.md](SECURITY.md) for vulnerabilities. Public feedback must not
+include proposed implementation content or private data and is not a
+contribution grant. Only work authored or commissioned by copyright holder
+Jongho Yoo under an appropriate written rights arrangement may be added. No
+public CLA or DCO intake is offered; see [CLA.md](CLA.md). You may run
+[README verification](README.md#verify) when evaluating the current source.

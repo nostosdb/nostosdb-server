@@ -1,6 +1,6 @@
 [package]
-name = "nostos-client"
-description = "Thin blocking client and wire contract for the NostosDB database protocol"
+name = "nostdb-client"
+description = "Thin blocking client and wire contract for the NostDB database protocol"
 edition = "2024"
 license = "SSPL-1.0"
 publish = false

@@ -5,11 +5,11 @@ use std::sync::{Arc, Mutex};
 
 use base64::Engine;
 use base64::engine::general_purpose::STANDARD as BASE64;
-use nostos_client::{
+use nostdb_client::{
     ClientFrame, ClientRequest, ClientRole, DATABASE_PROTOCOL_VERSION, ErrorCode, MAX_FRAME_BYTES,
     SNAPSHOT_CHUNK_BYTES, ServerFrame, ServerResponse,
 };
-use nostos_engine::{CancellationToken, StatementResult};
+use nostdb_engine::{CancellationToken, StatementResult};
 use tokio::io::{AsyncRead, AsyncReadExt, AsyncWrite, AsyncWriteExt};
 use tokio::net::{TcpListener, TcpStream};
 use tokio::sync::{Semaphore, mpsc, watch};
@@ -467,7 +467,7 @@ async fn dispatch(
                 .await;
             };
             let invalid_read_only = statements.iter().find(|statement| {
-                statement.read_only && nostos_engine::prepare_write(&statement.query).is_ok()
+                statement.read_only && nostdb_engine::prepare_write(&statement.query).is_ok()
             });
             if invalid_read_only.is_some() {
                 return send_failure(

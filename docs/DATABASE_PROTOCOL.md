@@ -1,10 +1,10 @@
-# NostosDB database protocol version 1
+# NostDB database protocol version 1
 
-Status: implemented preview protocol; compatibility is governed independently from the HTTP compatibility adapter, `.nostos`, `.ndb`, catalog, and package versions.
+Status: implemented preview protocol; compatibility is governed independently from the HTTP compatibility adapter, `.nostdb`, `.ndb`, catalog, and package versions.
 
 ## Transport and framing
 
-Version 1 uses an ordered TCP byte stream. A client address has the form `nostos://IP:PORT`; version 1 provides no TLS negotiation. `nostosd init` binds to loopback by default. Exposing plaintext TCP beyond a trusted local or container boundary requires an explicit operator decision and is not presented as production-safe.
+Version 1 uses an ordered TCP byte stream. A client address has the form `nostdb://IP:PORT`; version 1 provides no TLS negotiation. `nostd init` binds to loopback by default. Exposing plaintext TCP beyond a trusted local or container boundary requires an explicit operator decision and is not presented as production-safe.
 
 Every frame is exactly:
 
@@ -29,7 +29,7 @@ The first client frame must be:
   "type": "hello",
   "protocol_version": 1,
   "credential": "opaque-token",
-  "client_name": "nostos-cli"
+  "client_name": "nostdb-cli"
 }
 ```
 
@@ -51,7 +51,7 @@ Roles are:
 - `query`: authenticated ping, Database selection, queries, streaming, transactions, and cancellation;
 - `admin`: every query capability plus catalog lifecycle, physical snapshot, and logical package operations.
 
-`nostosd init` writes distinct protected query and admin credential files. Credentials are not accepted as daemon or CLI command-line values. The CLI reads `NOSTOS_CREDENTIAL` or `--credential-file PATH`.
+`nostd init` writes distinct protected query and admin credential files. Credentials are not accepted as daemon or CLI command-line values. The CLI reads `NOSTDB_CREDENTIAL` or `--credential-file PATH`.
 
 ## Connection state
 
@@ -59,7 +59,7 @@ After authentication a connection has no selected Database, no transaction, and 
 
 1. `select_database` resolves a catalog name, binds the connection to that immutable stable Database ID, and returns `database_selected` with stable ID, name, and state. A later rename preserves the selection; a drop makes it unavailable even if another Database reuses the old name.
 2. `query`, `begin`, `commit`, and `rollback` require a selected Database.
-3. `begin` creates one connection-local transaction queue. Queries return `queued`; `commit` executes the complete queue through `nostos-engine::execute_transaction_limited`, and `rollback` discards it.
+3. `begin` creates one connection-local transaction queue. Queries return `queued`; `commit` executes the complete queue through `nostdb-engine::execute_transaction_limited`, and `rollback` discards it.
 4. Database selection, rename/drop, restore, and logical import are rejected while a transaction is active.
 5. Connection close cancels active cooperative queries, discards a queued transaction, and drops an incomplete snapshot upload.
 
@@ -127,7 +127,7 @@ All operations below require `admin`:
 | `database_inspect(database)` | `database_info` | format, generation, checksum, health, and counts |
 | `database_rename(database,new_name)` | `database_renamed` | stable Database ID is unchanged |
 | `database_drop(database,confirm_name)` | `database_dropped` | confirmation must exactly equal the current name |
-| `logical_export(database)` | `logical_package` | portable versioned `.nostos` package |
+| `logical_export(database)` | `logical_package` | portable versioned `.nostdb` package |
 | `logical_import(database,package)` | `logical_imported` | isolated Core compile, validate, then replace |
 
 Create, rename, and drop use the versioned catalog lifecycle journal. A drop moves closed storage out of the active tree only after the catalog transition. Startup completes or rolls back a journal before accepting connections.
@@ -182,4 +182,4 @@ Errors do not expose credential values or managed filesystem paths. `retryable` 
 
 ## Compatibility boundary
 
-Database protocol version 1 is independent from HTTP compatibility protocol 1. The legacy `nostos-server` binary and `/v1/*` HTTP routes remain only for the current MCP compatibility path. New CLI and driver behavior uses `nostos-client` and this protocol, and requires no HTTP endpoint knowledge.
+Database protocol version 1 is independent from HTTP compatibility protocol 1. The legacy `nostdb-server` binary and `/v1/*` HTTP routes remain only for the current MCP compatibility path. New CLI and driver behavior uses `nostdb-client` and this protocol, and requires no HTTP endpoint knowledge.

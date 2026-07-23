@@ -1,6 +1,6 @@
 use std::collections::BTreeMap;
 
-use nostos_engine::{EdgeKind, Parameters, QueryResult, QueryValue, StatementResult, WriteResult};
+use nostdb_engine::{EdgeKind, Parameters, QueryResult, QueryValue, StatementResult, WriteResult};
 use serde::Serialize;
 use serde_json::{Map, Value, json};
 

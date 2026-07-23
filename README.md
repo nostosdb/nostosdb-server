@@ -1,40 +1,40 @@
-# nostosdb-server
+# nostdb-server
 
-Source-available implementation repository for the installable single-node NostosDB database daemon, licensed under SSPL-1.0.
+Source-available implementation repository for the installable single-node NostDB database daemon, licensed under SSPL-1.0.
 
 Public-preview source only: no supported binary, hosted service, TLS endpoint, production SLA, or external contribution intake exists. Read [PREVIEW.md](PREVIEW.md), [SECURITY.md](SECURITY.md), and [CLA status](CLA.md).
 
-The implemented product path is `nostosd`: a long-running process that owns a versioned data directory and catalog, stores one or more named Databases, and accepts connections from the `nostos` CLI and thin clients. It runs as the same binary in a foreground process, native operating-system service candidate, or Docker container with persistent config and data volumes. Read the [database server contract](docs/DATABASE_SERVER.md) and exact [database protocol](docs/DATABASE_PROTOCOL.md).
+The implemented product path is `nostd`: a long-running process that owns a versioned data directory and catalog, stores one or more named Databases, and accepts connections from the `nostdb` CLI and thin clients. It runs as the same binary in a foreground process, native operating-system service candidate, or Docker container with persistent config and data volumes. Read the [database server contract](docs/DATABASE_SERVER.md) and exact [database protocol](docs/DATABASE_PROTOCOL.md).
 
-The old `nostos-server` binary still opens one explicit `.ndb` and exposes HTTP protocol version 1 for current MCP compatibility. It is transitional, separately versioned, and must not be presented as the database product or as an application REST API platform.
+The old `nostdb-server` binary still opens one explicit `.ndb` and exposes HTTP protocol version 1 for current MCP compatibility. It is transitional, separately versioned, and must not be presented as the database product or as an application REST API platform.
 
 ## Package-manager targets
 
 The intended global npm package installs the Server and matching CLI together; the Homebrew formula exposes the same two commands on macOS:
 
 ```bash
-npm install --global @nostosdb/server
+npm install --global @nostdb/server
 # or
-brew install nostosdb/tap/nostosdb
+brew install nostdb/tap/nostdb
 
-nostosd --version
-nostos --version
+nostd --version
+nostdb --version
 ```
 
-Neither channel is published. The implemented `@nostosdb/server` wrapper selects one exact native Server package, depends on the exact matching `@nostosdb/cli`, contains no lifecycle downloader, and does not initialize or start the daemon during installation. CLI-only users install the separate `@nostosdb/cli` package.
+Neither channel is published. The implemented `@nostdb/server` wrapper selects one exact native Server package, depends on the exact matching `@nostdb/cli`, contains no lifecycle downloader, and does not initialize or start the daemon during installation. CLI-only users install the separate `@nostdb/cli` package.
 
-The Homebrew caveat keeps initialization explicit and first creates `~/.nostosdb/data`, `config`, and `logs` with mode `0700`; run it as the service user without `sudo`.
+The Homebrew caveat keeps initialization explicit and first creates `~/.nostdb/data`, `config`, and `logs` with mode `0700`; run it as the service user without `sudo`.
 
-## Initialize and run `nostosd`
+## Initialize and run `nostd`
 
 From this repository root, the following builds both sibling binaries and keeps all evaluation state in a disposable absolute temporary directory:
 
 ```bash
 set -eu
 WORKSPACE_ROOT="$(cd .. && pwd -P)"
-EVALUATION_ROOT="$(mktemp -d "${TMPDIR:-/tmp}/nostosdb-server.XXXXXX")"
-SERVER_BIN="$WORKSPACE_ROOT/nostosdb-server/target/debug/nostosd"
-CLI_BIN="$WORKSPACE_ROOT/nostosdb-cli/target/debug/nostos"
+EVALUATION_ROOT="$(mktemp -d "${TMPDIR:-/tmp}/nostdb-server.XXXXXX")"
+SERVER_BIN="$WORKSPACE_ROOT/nostdb-server/target/debug/nostd"
+CLI_BIN="$WORKSPACE_ROOT/nostdb-cli/target/debug/nostdb"
 DAEMON_PID=
 cleanup() {
   if [ -n "${DAEMON_PID:-}" ]; then
@@ -46,8 +46,8 @@ cleanup() {
 }
 trap cleanup EXIT
 
-cargo build --locked --manifest-path "$WORKSPACE_ROOT/nostosdb-server/Cargo.toml" --bin nostosd
-cargo build --locked --manifest-path "$WORKSPACE_ROOT/nostosdb-cli/Cargo.toml" --bin nostos
+cargo build --locked --manifest-path "$WORKSPACE_ROOT/nostdb-server/Cargo.toml" --bin nostd
+cargo build --locked --manifest-path "$WORKSPACE_ROOT/nostdb-cli/Cargo.toml" --bin nostdb
 "$SERVER_BIN" init \
   --data-dir "$EVALUATION_ROOT/data" \
   --config "$EVALUATION_ROOT/server.toml" \
@@ -57,7 +57,7 @@ DAEMON_PID=$!
 
 attempt=0
 until "$CLI_BIN" server ping \
-  --server nostos://127.0.0.1:7878 \
+  --server nostdb://127.0.0.1:7878 \
   --credential-file "$EVALUATION_ROOT/data/credentials/client.token" >/dev/null 2>&1
 do
   attempt=$((attempt + 1))
@@ -66,10 +66,10 @@ do
 done
 
 "$CLI_BIN" database create knowledge \
-  --server nostos://127.0.0.1:7878 \
+  --server nostdb://127.0.0.1:7878 \
   --credential-file "$EVALUATION_ROOT/data/credentials/admin.token"
 "$CLI_BIN" query \
-  --server nostos://127.0.0.1:7878 --database knowledge \
+  --server nostdb://127.0.0.1:7878 --database knowledge \
   --credential-file "$EVALUATION_ROOT/data/credentials/client.token" \
   'RETURN 1 AS ready'
 
@@ -87,9 +87,9 @@ The managed tree uses immutable UUID Database IDs internally and never exposes p
 
 Candidate definitions are under [distribution](distribution/README.md):
 
-- npm wrapper/platform candidates for `@nostosdb/server`, exposing `nostosd` and the exact matching `nostos` CLI;
-- Homebrew formula `nostosdb`, commands `nostos`/`nostosd`, and a per-user service rooted at `~/.nostosdb`;
-- systemd service for `/etc/nostosdb/server.toml` and `/var/lib/nostosdb`;
+- npm wrapper/platform candidates for `@nostdb/server`, exposing `nostd` and the exact matching `nostdb` CLI;
+- Homebrew formula `nostdb`, commands `nostdb`/`nostd`, and a per-user service rooted at `~/.nostdb`;
+- systemd service for `/etc/nostdb/server.toml` and `/var/lib/nostdb`;
 - Windows foreground execution; Service Control Manager integration and protected credential ACL installation remain explicitly deferred;
 - [Dockerfile](Dockerfile) and [compose.yaml](compose.yaml) with separate config and authoritative data volumes.
 
@@ -109,7 +109,7 @@ Stop it with `docker compose down`. The named volumes intentionally remain for l
 Run the compatibility binary explicitly:
 
 ```bash
-NOSTOS_API_KEY='replace-me' cargo run --bin nostos-server -- \
+NOSTDB_API_KEY='replace-me' cargo run --bin nostdb-server -- \
   --database ./compatibility.ndb \
   --listen 127.0.0.1:8787
 ```
@@ -129,7 +129,7 @@ The complete request, response, session, limit, and import/export contract is in
 | `POST /v1/sessions/{id}/commit` | Execute and commit the complete queue atomically |
 | `POST /v1/sessions/{id}/rollback` | Discard the queue |
 | `GET`, `PUT /v1/admin/snapshot` | Export or compatibility-check and restore `.ndb` |
-| `GET`, `PUT /v1/admin/logical` | Export or validate and import a versioned `.nostos` package |
+| `GET`, `PUT /v1/admin/logical` | Export or validate and import a versioned `.nostdb` package |
 | `GET /metrics` | Return operational counters |
 
 Example query:
@@ -141,7 +141,7 @@ curl -sS http://127.0.0.1:8787/v1/query \
   --data '{"query":"MATCH (n) RETURN n","stream":true,"read_only":true}'
 ```
 
-Snapshot restore opens and integrity-checks the uploaded Format 0 artifact before taking the live database lock or replacing the current file. Logical import uses a versioned package containing `nostos.toml` plus normalized module paths and converts the synchronized candidate to Server/NDB authority explicitly.
+Snapshot restore opens and integrity-checks the uploaded Format 0 artifact before taking the live database lock or replacing the current file. Logical import uses a versioned package containing `nostdb.toml` plus normalized module paths and converts the synchronized candidate to Server/NDB authority explicitly.
 
 ## Verify
 

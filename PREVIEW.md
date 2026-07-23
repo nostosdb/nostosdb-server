@@ -2,7 +2,7 @@
 
 The Server is source-available SSPL-1.0 single-node evaluation software with an implemented daemon and unpublished deployment candidates, but no supported release, installer, registered service, published image, or hosted service.
 
-- `nostosd` implements a managed data directory, atomic named-Database catalog, exclusive ownership, stateful database protocol, remote CLI, transactions, cancellation, limits, snapshots, logical packages, and restart recovery.
+- `nostd` implements a managed data directory, atomic named-Database catalog, exclusive ownership, stateful database protocol, remote CLI, transactions, cancellation, limits, snapshots, logical packages, and restart recovery.
 - Protocol version 1 has separate query/admin credentials and no TLS negotiation. It binds to loopback by default; credential rotation, Database-scoped grants, multi-tenant identity, and production remote transport are not implemented.
 - Homebrew, systemd, Windows Service, Docker, and combined archive files are review candidates only. They have not been published, installed on a production host, or signed with production credentials.
 - The single-file HTTP binary is transitional MCP compatibility behavior, not the product identity or an application API platform. Its API-key and `/healthz` rules are separate from the database protocol.

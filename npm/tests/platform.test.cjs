@@ -18,17 +18,17 @@ const glibcReport = {
 };
 
 test("selects every declared Server OS and CPU package", () => {
-  assert.equal(packageFor("darwin", "arm64"), "@nostosdb/server-darwin-arm64");
-  assert.equal(packageFor("darwin", "x64"), "@nostosdb/server-darwin-x64");
-  assert.equal(packageFor("win32", "arm64"), "@nostosdb/server-win32-arm64");
-  assert.equal(packageFor("win32", "x64"), "@nostosdb/server-win32-x64");
+  assert.equal(packageFor("darwin", "arm64"), "@nostdb/server-darwin-arm64");
+  assert.equal(packageFor("darwin", "x64"), "@nostdb/server-darwin-x64");
+  assert.equal(packageFor("win32", "arm64"), "@nostdb/server-win32-arm64");
+  assert.equal(packageFor("win32", "x64"), "@nostdb/server-win32-x64");
   assert.equal(
     packageFor("linux", "arm64", glibcReport),
-    "@nostosdb/server-linux-arm64-gnu",
+    "@nostdb/server-linux-arm64-gnu",
   );
   assert.equal(
     packageFor("linux", "x64", glibcReport),
-    "@nostosdb/server-linux-x64-gnu",
+    "@nostdb/server-linux-x64-gnu",
   );
 });
 
@@ -42,7 +42,7 @@ test("rejects unsupported operating systems, CPUs, and Linux libc", () => {
 });
 
 test("requires an exact-version Server package and executable", (context) => {
-  const temporary = fs.mkdtempSync(path.join(os.tmpdir(), "nostosd-platform-test-"));
+  const temporary = fs.mkdtempSync(path.join(os.tmpdir(), "nostd-platform-test-"));
   context.after(() => fs.rmSync(temporary, { recursive: true, force: true }));
   const packageRoot = path.join(temporary, "package");
   const binaryDirectory = path.join(packageRoot, "bin");
@@ -50,12 +50,12 @@ test("requires an exact-version Server package and executable", (context) => {
   const manifestPath = path.join(packageRoot, "package.json");
   fs.writeFileSync(
     manifestPath,
-    JSON.stringify({ name: "@nostosdb/server-darwin-arm64", version: "0.0.1" }),
+    JSON.stringify({ name: "@nostdb/server-darwin-arm64", version: "0.0.1" }),
   );
-  const binary = path.join(binaryDirectory, "nostosd");
+  const binary = path.join(binaryDirectory, "nostd");
   fs.writeFileSync(binary, "fixture");
   const resolvePackage = (request) => {
-    assert.equal(request, "@nostosdb/server-darwin-arm64/package.json");
+    assert.equal(request, "@nostdb/server-darwin-arm64/package.json");
     return manifestPath;
   };
   assert.equal(

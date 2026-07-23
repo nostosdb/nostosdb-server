@@ -7,8 +7,8 @@ use std::path::{Path, PathBuf};
 use std::sync::{Arc, Mutex, RwLock};
 
 use fs2::FileExt;
-use nostos_client::{ClientRole, DatabaseDetails, DatabaseSummary, ErrorCode, WireQueryLimits};
-use nostos_engine::{
+use nostdb_client::{ClientRole, DatabaseDetails, DatabaseSummary, ErrorCode, WireQueryLimits};
+use nostdb_engine::{
     CancellationToken, DatabaseError, EmbeddedDatabase, Parameters, QueryErrorCode, QueryLimits,
     StatementResult, StorageErrorKind, prepare_write,
 };
@@ -20,7 +20,7 @@ use crate::catalog::{CatalogDatabase, CatalogStore, OperationKind, valid_databas
 use crate::config::{Credentials, DaemonConfig, write_credential};
 use crate::{ServerError, wire};
 
-/// Non-secret paths created by `nostosd init`.
+/// Non-secret paths created by `nostd init`.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct InitializationReport {
     /// Newly written configuration file.
@@ -802,8 +802,8 @@ struct LogicalModuleDocument {
     source: String,
 }
 
-impl From<nostos_engine::LogicalPackage> for LogicalPackageDocument {
-    fn from(package: nostos_engine::LogicalPackage) -> Self {
+impl From<nostdb_engine::LogicalPackage> for LogicalPackageDocument {
+    fn from(package: nostdb_engine::LogicalPackage) -> Self {
         Self {
             package_version: package.package_version,
             language_version: 1,
@@ -1271,8 +1271,8 @@ fn import_logical(
     let source_root = parent.join(format!("logical-import-{}", Uuid::new_v4()));
     fs::create_dir(&source_root).map_err(internal)?;
     let result = (|| {
-        fs::write(source_root.join("nostos.toml"), package.config).map_err(internal)?;
-        let config = nostos_engine::ProjectConfig::load(&source_root)
+        fs::write(source_root.join("nostdb.toml"), package.config).map_err(internal)?;
+        let config = nostdb_engine::ProjectConfig::load(&source_root)
             .map_err(|error| ProtocolFailure::new(ErrorCode::QueryError, error.to_string()))?;
         let mut seen = std::collections::BTreeSet::new();
         for module in package.modules {
@@ -1285,7 +1285,7 @@ fn import_logical(
             }
             let module_id = module
                 .stable_module_id
-                .parse::<nostos_engine::StableModuleId>()
+                .parse::<nostdb_engine::StableModuleId>()
                 .map_err(|_| {
                     ProtocolFailure::new(ErrorCode::QueryError, "invalid stable Module ID")
                 })?;
@@ -1293,7 +1293,7 @@ fn import_logical(
                 return Err(ProtocolFailure::new(
                     ErrorCode::QueryError,
                     format!(
-                        "stable Module ID does not match nostos.toml for {}",
+                        "stable Module ID does not match nostdb.toml for {}",
                         module.path
                     ),
                 ));
@@ -1305,7 +1305,7 @@ fn import_logical(
             fs::write(path, module.source).map_err(internal)?;
         }
         let candidate = source_root.join("candidate.ndb");
-        nostos_engine::Synchronizer::default()
+        nostdb_engine::Synchronizer::default()
             .sync(&source_root, &candidate)
             .map_err(|error| ProtocolFailure::new(ErrorCode::QueryError, error.to_string()))?;
         let bytes = fs::read(&candidate).map_err(internal)?;
@@ -1354,7 +1354,7 @@ fn safe_module_path(value: &str) -> Result<PathBuf, ProtocolFailure> {
         || path
             .components()
             .any(|component| !matches!(component, Component::Normal(_)))
-        || path.extension().and_then(|extension| extension.to_str()) != Some("nostos")
+        || path.extension().and_then(|extension| extension.to_str()) != Some("nostdb")
     {
         return Err(ProtocolFailure::new(
             ErrorCode::QueryError,
@@ -1437,7 +1437,7 @@ mod tests {
 
     fn test_root(name: &str) -> PathBuf {
         std::env::temp_dir().join(format!(
-            "nostos-daemon-{name}-{}-{}",
+            "nostdb-daemon-{name}-{}-{}",
             std::process::id(),
             Uuid::new_v4()
         ))

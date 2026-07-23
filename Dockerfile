@@ -1,23 +1,23 @@
 # syntax=docker/dockerfile:1
 FROM rust:1.85-bookworm AS build
 WORKDIR /source
-COPY nostosdb-core ./nostosdb-core
-COPY nostosdb-server ./nostosdb-server
-COPY nostosdb-cli ./nostosdb-cli
-RUN cargo build --locked --release --manifest-path nostosdb-server/Cargo.toml --bin nostosd \
-    && cargo build --locked --release --manifest-path nostosdb-cli/Cargo.toml --bin nostos
+COPY nostdb-core ./nostdb-core
+COPY nostdb-server ./nostdb-server
+COPY nostdb-cli ./nostdb-cli
+RUN cargo build --locked --release --manifest-path nostdb-server/Cargo.toml --bin nostd \
+    && cargo build --locked --release --manifest-path nostdb-cli/Cargo.toml --bin nostdb
 
 FROM debian:bookworm-slim
-RUN groupadd --system --gid 1700 nostosdb \
-    && useradd --system --uid 1700 --gid nostosdb --home-dir /var/lib/nostosdb --shell /usr/sbin/nologin nostosdb \
-    && install -d -o nostosdb -g nostosdb -m 0700 /var/lib/nostosdb \
-    && install -d -o nostosdb -g nostosdb -m 0700 /etc/nostosdb
-COPY --from=build /source/nostosdb-server/target/release/nostosd /usr/local/bin/nostosd
-COPY --from=build /source/nostosdb-cli/target/release/nostos /usr/local/bin/nostos
-USER nostosdb:nostosdb
-VOLUME ["/etc/nostosdb", "/var/lib/nostosdb"]
+RUN groupadd --system --gid 1700 nostdb \
+    && useradd --system --uid 1700 --gid nostdb --home-dir /var/lib/nostdb --shell /usr/sbin/nologin nostdb \
+    && install -d -o nostdb -g nostdb -m 0700 /var/lib/nostdb \
+    && install -d -o nostdb -g nostdb -m 0700 /etc/nostdb
+COPY --from=build /source/nostdb-server/target/release/nostd /usr/local/bin/nostd
+COPY --from=build /source/nostdb-cli/target/release/nostdb /usr/local/bin/nostdb
+USER nostdb:nostdb
+VOLUME ["/etc/nostdb", "/var/lib/nostdb"]
 EXPOSE 7878
-ENTRYPOINT ["nostosd"]
-CMD ["serve", "--config", "/etc/nostosdb/server.toml"]
+ENTRYPOINT ["nostd"]
+CMD ["serve", "--config", "/etc/nostdb/server.toml"]
 HEALTHCHECK --interval=10s --timeout=3s --start-period=5s --retries=3 \
-  CMD ["nostos", "server", "ping", "--server", "nostos://127.0.0.1:7878", "--credential-file", "/var/lib/nostosdb/credentials/client.token"]
+  CMD ["nostdb", "server", "ping", "--server", "nostdb://127.0.0.1:7878", "--credential-file", "/var/lib/nostdb/credentials/client.token"]

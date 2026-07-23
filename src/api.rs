@@ -15,7 +15,7 @@ use axum::response::{IntoResponse, Response};
 use axum::routing::{delete, get, post};
 use axum::{Json, Router};
 use futures_util::stream;
-use nostos_engine::{
+use nostdb_engine::{
     CancellationToken, DatabaseError, EmbeddedDatabase, LogicalPackage, Parameters, ProjectConfig,
     QueryErrorCode, QueryLimits, StatementResult, Synchronizer, prepare, prepare_write,
 };
@@ -680,11 +680,11 @@ async fn export_snapshot(State(state): State<AppState>) -> Result<Response, ApiE
     let mut response = Response::new(Body::from(bytes));
     response.headers_mut().insert(
         header::CONTENT_TYPE,
-        HeaderValue::from_static("application/vnd.nostos.ndb"),
+        HeaderValue::from_static("application/vnd.nostdb.ndb"),
     );
     response
         .headers_mut()
-        .insert("x-nostos-ndb-format", HeaderValue::from_static("0"));
+        .insert("x-nostdb-ndb-format", HeaderValue::from_static("0"));
     Ok(response)
 }
 
@@ -891,10 +891,10 @@ fn import_logical_package(state: &AppState, package: LogicalPackageBody) -> Resu
         .database_path
         .parent()
         .unwrap_or_else(|| FsPath::new("."));
-    let directory = parent.join(format!(".nostos-logical-import-{}", Uuid::new_v4()));
+    let directory = parent.join(format!(".nostdb-logical-import-{}", Uuid::new_v4()));
     fs::create_dir(&directory).map_err(|error| ApiError::internal(error.to_string()))?;
     let result = (|| {
-        fs::write(directory.join("nostos.toml"), package.config)
+        fs::write(directory.join("nostdb.toml"), package.config)
             .map_err(|error| ApiError::internal(error.to_string()))?;
         let config = ProjectConfig::load(&directory).map_err(|error| {
             ApiError::new(
@@ -913,13 +913,13 @@ fn import_logical_package(state: &AppState, package: LogicalPackageBody) -> Resu
             }
             let module_id = module
                 .stable_module_id
-                .parse::<nostos_engine::StableModuleId>()
+                .parse::<nostdb_engine::StableModuleId>()
                 .map_err(|_| {
                     ApiError::bad_request(format!("invalid stable_module_id for {}", module.path))
                 })?;
             if config.module_id(&path) != Some(module_id) {
                 return Err(ApiError::bad_request(format!(
-                    "stable_module_id does not match nostos.toml for {}",
+                    "stable_module_id does not match nostdb.toml for {}",
                     module.path
                 )));
             }
@@ -970,7 +970,7 @@ fn safe_relative(value: &str) -> Result<PathBuf, ApiError> {
         || path
             .components()
             .any(|component| !matches!(component, Component::Normal(_)))
-        || path.extension().and_then(|value| value.to_str()) != Some("nostos")
+        || path.extension().and_then(|value| value.to_str()) != Some("nostdb")
     {
         return Err(ApiError::bad_request(format!(
             "invalid logical module path `{value}`"

@@ -26,8 +26,8 @@ def release_manifest() -> dict:
     manifest = read_json(MANIFEST_PATH)
     if manifest.get("schema_version") != 1:
         raise CandidateError("unsupported release manifest schema")
-    if manifest.get("binary") != "nostosd":
-        raise CandidateError("release manifest must name nostosd")
+    if manifest.get("binary") != "nostd":
+        raise CandidateError("release manifest must name nostd")
     return manifest
 
 
@@ -65,4 +65,4 @@ def host_target() -> str:
 
 
 def executable_name(target: str) -> str:
-    return "nostosd.exe" if "windows" in target else "nostosd"
+    return "nostd.exe" if "windows" in target else "nostd"

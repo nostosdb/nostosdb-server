@@ -1,11 +1,11 @@
-# `@nostosdb/server` candidate launcher
+# `@nostdb/server` candidate launcher
 
-This unpublished SSPL-1.0 package installs the native `nostosd` database daemon and the exact matching `@nostosdb/cli`. One global install exposes both commands:
+This unpublished SSPL-1.0 package installs the native `nostd` database daemon and the exact matching `@nostdb/cli`. One global install exposes both commands:
 
 ```bash
-npm install --global @nostosdb/server
-nostosd --version
-nostos --version
+npm install --global @nostdb/server
+nostd --version
+nostdb --version
 ```
 
 The JavaScript wrapper contains no Core, query, storage, or `.ndb` implementation. It validates the exact OS/CPU native Server package and delegates process execution through the matching CLI launcher's shell-free process boundary. It has no lifecycle downloader and does not initialize or start a daemon during installation.

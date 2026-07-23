@@ -6,12 +6,12 @@ use std::thread;
 use std::time::{Duration, Instant};
 
 fn binary() -> &'static str {
-    env!("CARGO_BIN_EXE_nostosd")
+    env!("CARGO_BIN_EXE_nostd")
 }
 
 fn test_root(name: &str) -> PathBuf {
     std::env::temp_dir().join(format!(
-        "nostosd-process-{name}-{}-{}",
+        "nostd-process-{name}-{}-{}",
         std::process::id(),
         uuid::Uuid::new_v4()
     ))
@@ -43,7 +43,7 @@ fn subcommand_help_is_successful_and_actionable() {
             "{command} help stderr must be empty"
         );
         let stdout = String::from_utf8(output.stdout).expect("help is UTF-8");
-        assert!(stdout.contains(&format!("nostosd {command}")));
+        assert!(stdout.contains(&format!("nostd {command}")));
         assert!(stdout.contains(expected_option));
     }
 }
@@ -91,8 +91,8 @@ fn sigterm_uses_the_graceful_shutdown_path() {
         .expect("query credential reads");
     let deadline = Instant::now() + Duration::from_secs(5);
     let _active_client = loop {
-        match nostos_client::Client::connect(
-            &format!("nostos://{listen}"),
+        match nostdb_client::Client::connect(
+            &format!("nostdb://{listen}"),
             query_credential.trim(),
             "SIGTERM process test",
         ) {
@@ -116,10 +116,10 @@ fn sigterm_uses_the_graceful_shutdown_path() {
     };
     assert!(status.success(), "SIGTERM exit was {status}");
 
-    let config = nostos_server::config::DaemonConfig::load(&config_path)
+    let config = nostdb_server::config::DaemonConfig::load(&config_path)
         .expect("configuration remains readable");
     drop(
-        nostos_server::daemon::DatabaseDaemon::open(config)
+        nostdb_server::daemon::DatabaseDaemon::open(config)
             .expect("graceful shutdown released daemon ownership"),
     );
     fs::remove_dir_all(root).expect("test directory removes");

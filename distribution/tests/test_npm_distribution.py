@@ -27,14 +27,14 @@ def invoke(*arguments):
 
 class NpmDistributionTests(unittest.TestCase):
     def setUp(self):
-        self.temporary = Path(tempfile.mkdtemp(prefix="nostosd-npm-test-"))
+        self.temporary = Path(tempfile.mkdtemp(prefix="nostd-npm-test-"))
 
     def tearDown(self):
         shutil.rmtree(self.temporary)
 
     def fake_binary(self, target):
         binary = self.temporary / executable_name(target)
-        binary.write_bytes(b"native nostosd fixture\n")
+        binary.write_bytes(b"native nostd fixture\n")
         binary.chmod(0o755)
         return binary
 
@@ -56,7 +56,7 @@ class NpmDistributionTests(unittest.TestCase):
             details["npm_package"] for details in manifest["targets"].values()
         }
         self.assertEqual(len(packages), 6)
-        self.assertTrue(all(name.startswith("@nostosdb/server-") for name in packages))
+        self.assertTrue(all(name.startswith("@nostdb/server-") for name in packages))
 
     def test_candidate_scripts_do_not_publish(self):
         for path in sorted(SCRIPTS.glob("*.py")):
@@ -79,7 +79,7 @@ class NpmDistributionTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
         payload = json.loads(result.stdout)
         self.assertFalse(payload["published"])
-        self.assertEqual(payload["launcher"]["name"], "@nostosdb/server")
+        self.assertEqual(payload["launcher"]["name"], "@nostdb/server")
         launcher = output / payload["launcher"]["filename"]
         platform = output / payload["platform"]["filename"]
         self.assertTrue(launcher.is_file())
@@ -102,8 +102,8 @@ class NpmDistributionTests(unittest.TestCase):
                 executable = "package/bin/{}".format(executable_name(target))
                 self.assertEqual(contents[executable], binary.read_bytes())
             else:
-                self.assertEqual(manifest["dependencies"], {"@nostosdb/cli": "0.0.1"})
-                self.assertEqual(set(manifest["bin"]), {"nostos", "nostosd"})
+                self.assertEqual(manifest["dependencies"], {"@nostdb/cli": "0.0.1"})
+                self.assertEqual(set(manifest["bin"]), {"nostdb", "nostd"})
 
     def test_refuses_to_replace_an_existing_stage(self):
         target = host_target()

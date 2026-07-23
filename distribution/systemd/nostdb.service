@@ -1,24 +1,24 @@
 [Unit]
-Description=NostosDB single-node database daemon
-Documentation=https://github.com/nostosdb/nostosdb-server
+Description=NostDB single-node database daemon
+Documentation=https://github.com/nostdb/nostdb-server
 After=network.target
 
 [Service]
 Type=simple
-User=nostosdb
-Group=nostosdb
-ExecStart=/usr/local/bin/nostosd serve --config /etc/nostosdb/server.toml
+User=nostdb
+Group=nostdb
+ExecStart=/usr/local/bin/nostd serve --config /etc/nostdb/server.toml
 Restart=on-failure
 RestartSec=2s
 TimeoutStopSec=10s
-StateDirectory=nostosdb
+StateDirectory=nostdb
 StateDirectoryMode=0700
 UMask=0077
 NoNewPrivileges=true
 PrivateTmp=true
 ProtectHome=true
 ProtectSystem=strict
-ReadWritePaths=/var/lib/nostosdb
+ReadWritePaths=/var/lib/nostdb
 RestrictAddressFamilies=AF_INET AF_INET6
 
 [Install]

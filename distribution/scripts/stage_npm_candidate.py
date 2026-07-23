@@ -60,7 +60,7 @@ def main() -> int:
         if stage.exists():
             raise CandidateError("refusing to replace npm stage: {}".format(stage))
         args.output.mkdir(parents=True, exist_ok=True)
-        package_directory = details["npm_package"].replace("@nostosdb/server-", "")
+        package_directory = details["npm_package"].replace("@nostdb/server-", "")
         platform_source = ROOT / "npm" / "packages" / package_directory
         platform_stage = stage / "platform"
         launcher_stage = stage / "launcher"
@@ -84,7 +84,7 @@ def main() -> int:
         launcher_result = npm_pack(launcher_stage, args.output)
         if platform_result["name"] != details["npm_package"]:
             raise CandidateError("packed unexpected Server platform package")
-        if launcher_result["name"] != "@nostosdb/server":
+        if launcher_result["name"] != "@nostdb/server":
             raise CandidateError("packed unexpected Server launcher package")
         for result in (platform_result, launcher_result):
             if result["version"] != manifest["version"]:
@@ -98,7 +98,7 @@ def main() -> int:
         print(json.dumps(payload, sort_keys=True))
         return 0
     except (CandidateError, OSError, ValueError, subprocess.SubprocessError) as error:
-        print("nostosdb-server-npm-candidate: {}".format(error), file=sys.stderr)
+        print("nostdb-server-npm-candidate: {}".format(error), file=sys.stderr)
         return 1
 
 

@@ -5,7 +5,7 @@ use std::fs::{self, OpenOptions};
 use std::io::Write;
 use std::path::{Path, PathBuf};
 
-use nostos_client::DatabaseSummary;
+use nostdb_client::DatabaseSummary;
 use serde::{Deserialize, Serialize};
 
 use crate::ServerError;
@@ -179,7 +179,7 @@ impl CatalogStore {
     pub(crate) fn load(root: &Path) -> Result<Self, ServerError> {
         if !root.is_dir() {
             return Err(ServerError::new(format!(
-                "data directory {} does not exist or is not a directory; run `nostosd init` first",
+                "data directory {} does not exist or is not a directory; run `nostd init` first",
                 root.display()
             )));
         }
@@ -364,7 +364,7 @@ fn recover_atomic_state(root: &Path) -> Result<(), ServerError> {
     }
     if !state.exists() {
         return Err(ServerError::new(
-            "data directory has no server-state catalog; run `nostosd init` for a fresh directory",
+            "data directory has no server-state catalog; run `nostd init` for a fresh directory",
         ));
     }
     Ok(())
@@ -552,7 +552,7 @@ mod tests {
 
     fn root(name: &str) -> PathBuf {
         std::env::temp_dir().join(format!(
-            "nostos-catalog-{name}-{}-{}",
+            "nostdb-catalog-{name}-{}-{}",
             std::process::id(),
             uuid::Uuid::new_v4()
         ))

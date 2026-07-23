@@ -1,8 +1,8 @@
-# Agent instructions for nostosdb-server
+# Agent instructions for nostdb-server
 
 Follow the Root `AGENTS.md` when working in the multi-repository workspace.
 
-- This repository owns the installable `nostosd` database-daemon, managed data-directory, Database catalog, and network boundary. It consumes the public `nostos-engine` facade.
+- This repository owns the installable `nostd` database-daemon, managed data-directory, Database catalog, and network boundary. It consumes the public `nostdb-engine` facade.
 - Do not duplicate the query engine, planner, synchronization, or storage.
 - Treat Database names and stable Database IDs as client-visible identity; never expose a managed filesystem path as Database identity.
 - While the current HTTP compatibility transport exists, keep every operational endpoint behind authentication; only liveness may be public.
