@@ -121,7 +121,7 @@ Snapshots are physical and format-specific. Version 1 accepts only the exact
 {
   "package_version": 1,
   "language_version": 1,
-  "config": "language_version = 1\n...",
+  "settings": "{\"version\":1,\"database\":{\"root\":\"root.nostdb\",\"links\":[]},\"source\":{\"version\":1,\"enabled\":true,\"include\":[\"modules/*.nost\"],\"modules\":{\"modules/00000000-0000-0000-0000-000000000001.nost\":\"00000000-0000-0000-0000-000000000001\"}}}\n",
   "modules": [
     {
       "path": "modules/00000000-0000-0000-0000-000000000001.nost",
@@ -133,12 +133,12 @@ Snapshots are physical and format-specific. Version 1 accepts only the exact
 ```
 
 `PUT /v1/admin/logical` accepts the same shape. Paths must be normalized,
-relative, and traversal-free; module IDs must match the source modules. The
-server constructs and synchronizes a complete candidate project in isolation,
-then explicitly changes that candidate from Source authority to Server/NDB
-authority before installing it. Invalid configuration, sources, imports,
-constraints, or unrepresentable logical export state are rejected without
-changing the live database.
+relative, and traversal-free; module IDs must match the source modules and
+settings mappings. The server writes both below a candidate `.nostdb/`,
+synchronizes the complete project in isolation, then explicitly changes that
+candidate from Source authority to Server/NDB authority before installing it.
+Invalid settings, sources, imports, constraints, or unrepresentable logical
+export state are rejected without changing the live database.
 
 Logical packages are portable source representations. They are not `.nostdb`
 snapshots and do not promise preservation of physical internal IDs.

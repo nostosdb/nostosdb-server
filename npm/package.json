@@ -1,6 +1,6 @@
 {
   "name": "@nostdb/server",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Cross-platform launcher for the NostDB database server and CLI",
   "license": "SSPL-1.0",
   "main": "lib/launcher.cjs",
@@ -28,15 +28,15 @@
     "url": "https://github.com/nostdb/nostdb-server/issues"
   },
   "dependencies": {
-    "@nostdb/cli": "0.0.2"
+    "@nostdb/cli": "0.0.3"
   },
   "optionalDependencies": {
-    "@nostdb/server-darwin-arm64": "0.0.2",
-    "@nostdb/server-darwin-x64": "0.0.2",
-    "@nostdb/server-linux-arm64-gnu": "0.0.2",
-    "@nostdb/server-linux-x64-gnu": "0.0.2",
-    "@nostdb/server-win32-arm64": "0.0.2",
-    "@nostdb/server-win32-x64": "0.0.2"
+    "@nostdb/server-darwin-arm64": "0.0.3",
+    "@nostdb/server-darwin-x64": "0.0.3",
+    "@nostdb/server-linux-arm64-gnu": "0.0.3",
+    "@nostdb/server-linux-x64-gnu": "0.0.3",
+    "@nostdb/server-win32-arm64": "0.0.3",
+    "@nostdb/server-win32-x64": "0.0.3"
   },
   "publishConfig": {
     "access": "public"

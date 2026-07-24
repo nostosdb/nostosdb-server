@@ -5,7 +5,7 @@ edition = "2024"
 license = "SSPL-1.0"
 publish = false
 rust-version = "1.85"
-version = "0.0.2"
+version = "0.0.3"
 
 [dependencies]
 serde = { version = "1.0.228", features = ["derive"] }

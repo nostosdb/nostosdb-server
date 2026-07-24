@@ -9,7 +9,10 @@ Read [PREVIEW.md](PREVIEW.md), [SECURITY.md](SECURITY.md), and
 
 The implemented product path is `nostd`: a long-running process that owns a versioned data directory and catalog, stores one or more named Databases, and accepts connections from the `nostdb` CLI and thin clients. It runs as the same binary in a foreground process, native operating-system service candidate, or Docker container with persistent config and data volumes. Read the [database server contract](docs/DATABASE_SERVER.md) and exact [database protocol](docs/DATABASE_PROTOCOL.md).
 
-The old `nostdb-server` binary still opens one explicit `.nostdb` and exposes HTTP protocol version 1 for current MCP compatibility. It is transitional, separately versioned, and must not be presented as the database product or as an application REST API platform.
+The old `nostdb-server` binary still opens one explicit file whose name ends in
+`.nostdb` and exposes HTTP protocol version 1 for current MCP compatibility. It
+is transitional, separately versioned, and must not be presented as the
+database product or as an application REST API platform.
 
 ## Package-manager targets
 
@@ -27,7 +30,8 @@ nostdb --version
 ```
 
 `@nostdb/server@0.0.2` and its six native packages are published under
-`latest` and `next`; the Homebrew channel is not published. The wrapper selects
+`latest` and `next`; this checkout is the unreleased `0.0.3` line and the
+Homebrew channel is not published. The wrapper selects
 one exact native Server package, depends on the exact matching `@nostdb/cli`,
 contains no lifecycle downloader, and does not initialize or start the daemon
 during installation. CLI-only users install the separate `@nostdb/cli`
@@ -153,7 +157,11 @@ curl -sS http://127.0.0.1:8787/v1/query \
   --data '{"query":"MATCH (n) RETURN n","stream":true,"read_only":true}'
 ```
 
-Snapshot restore opens and integrity-checks the uploaded Format 0 artifact before taking the live database lock or replacing the current file. Logical import uses a versioned package containing `nostdb.json` plus normalized module paths and converts the synchronized candidate to Server/NDB authority explicitly.
+Snapshot restore opens and integrity-checks the uploaded Format 0 artifact
+before taking the live database lock or replacing the current file. Logical
+import uses a versioned package containing complete
+`.nostdb/settings.json` text plus normalized `.nostdb/`-relative module paths,
+then converts the synchronized candidate to Server/NDB authority explicitly.
 
 ## Verify
 

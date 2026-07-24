@@ -1,6 +1,6 @@
 {
   "name": "@nostdb/server-darwin-arm64",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "NostDB database server for macOS Apple Silicon",
   "license": "SSPL-1.0",
   "os": ["darwin"],

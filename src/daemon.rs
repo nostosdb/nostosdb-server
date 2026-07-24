@@ -158,7 +158,7 @@ impl DatabaseDaemon {
                     entry.name
                 ))
             })?;
-            if info.nost {
+            if info.source_enabled {
                 return Err(ServerError::new(format!(
                     "managed Database `{}` still has a human-readable-source synchronization baseline; import it explicitly",
                     entry.name
@@ -790,7 +790,7 @@ fn rollback_initialization(
 struct LogicalPackageDocument {
     package_version: u32,
     language_version: u32,
-    config: String,
+    settings: String,
     modules: Vec<LogicalModuleDocument>,
 }
 
@@ -807,7 +807,7 @@ impl From<nostdb_engine::LogicalPackage> for LogicalPackageDocument {
         Self {
             package_version: package.package_version,
             language_version: 1,
-            config: package.config,
+            settings: package.settings,
             modules: package
                 .modules
                 .into_iter()
@@ -1269,9 +1269,10 @@ fn import_logical(
         .parent()
         .ok_or_else(|| internal("managed Database path has no parent"))?;
     let source_root = parent.join(format!("logical-import-{}", Uuid::new_v4()));
-    fs::create_dir(&source_root).map_err(internal)?;
+    let storage = source_root.join(".nostdb");
+    fs::create_dir_all(&storage).map_err(internal)?;
     let result = (|| {
-        fs::write(source_root.join("nostdb.json"), package.config).map_err(internal)?;
+        fs::write(storage.join("settings.json"), package.settings).map_err(internal)?;
         let config = nostdb_engine::ProjectConfig::load(&source_root)
             .map_err(|error| ProtocolFailure::new(ErrorCode::QueryError, error.to_string()))?;
         let mut seen = std::collections::BTreeSet::new();
@@ -1293,18 +1294,18 @@ fn import_logical(
                 return Err(ProtocolFailure::new(
                     ErrorCode::QueryError,
                     format!(
-                        "stable Module ID does not match nostdb.json for {}",
+                        "stable Module ID does not match settings.json for {}",
                         module.path
                     ),
                 ));
             }
-            let path = source_root.join(&relative);
+            let path = storage.join(&relative);
             if let Some(parent) = path.parent() {
                 fs::create_dir_all(parent).map_err(internal)?;
             }
             fs::write(path, module.source).map_err(internal)?;
         }
-        let candidate = source_root.join("candidate.nostdb");
+        let candidate = storage.join("candidate.nostdb");
         nostdb_engine::Synchronizer::default()
             .sync(&source_root, &candidate)
             .map_err(|error| ProtocolFailure::new(ErrorCode::QueryError, error.to_string()))?;
@@ -1818,7 +1819,7 @@ mod tests {
         let package = LogicalPackageDocument {
             package_version: 1,
             language_version: 1,
-            config: "this is not valid TOML =".to_owned(),
+            settings: "this is not valid JSON".to_owned(),
             modules: Vec::new(),
         };
 

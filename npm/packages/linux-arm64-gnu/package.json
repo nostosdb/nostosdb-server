@@ -1,6 +1,6 @@
 {
   "name": "@nostdb/server-linux-arm64-gnu",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "NostDB database server for GNU/Linux ARM64",
   "license": "SSPL-1.0",
   "os": ["linux"],

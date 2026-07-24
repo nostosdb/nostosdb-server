@@ -221,7 +221,7 @@ async fn catalog(State(state): State<AppState>) -> Result<Json<Value>, ApiError>
                 "checksum_codec_version": info.checksum_codec_version,
                 "generation": info.generation,
                 "logical_checksum": format!("{:016x}", info.logical_checksum),
-                "nost": info.nost,
+                "source_enabled": info.source_enabled,
             },
             "counts": {
                 "schemas": counts.schemas,
@@ -794,7 +794,7 @@ fn snapshot_incompatible(error: impl std::fmt::Display) -> ApiError {
 struct LogicalPackageBody {
     package_version: u32,
     language_version: u32,
-    config: String,
+    settings: String,
     modules: Vec<LogicalModuleBody>,
 }
 
@@ -810,7 +810,7 @@ impl From<LogicalPackage> for LogicalPackageBody {
         Self {
             package_version: package.package_version,
             language_version: 1,
-            config: package.config,
+            settings: package.settings,
             modules: package
                 .modules
                 .into_iter()
@@ -892,9 +892,10 @@ fn import_logical_package(state: &AppState, package: LogicalPackageBody) -> Resu
         .parent()
         .unwrap_or_else(|| FsPath::new("."));
     let directory = parent.join(format!(".nostdb-logical-import-{}", Uuid::new_v4()));
-    fs::create_dir(&directory).map_err(|error| ApiError::internal(error.to_string()))?;
+    let storage = directory.join(".nostdb");
+    fs::create_dir_all(&storage).map_err(|error| ApiError::internal(error.to_string()))?;
     let result = (|| {
-        fs::write(directory.join("nostdb.json"), package.config)
+        fs::write(storage.join("settings.json"), package.settings)
             .map_err(|error| ApiError::internal(error.to_string()))?;
         let config = ProjectConfig::load(&directory).map_err(|error| {
             ApiError::new(
@@ -919,11 +920,11 @@ fn import_logical_package(state: &AppState, package: LogicalPackageBody) -> Resu
                 })?;
             if config.module_id(&path) != Some(module_id) {
                 return Err(ApiError::bad_request(format!(
-                    "stable_module_id does not match nostdb.json for {}",
+                    "stable_module_id does not match settings.json for {}",
                     module.path
                 )));
             }
-            let target = directory.join(path);
+            let target = storage.join(path);
             if let Some(parent) = target.parent() {
                 fs::create_dir_all(parent)
                     .map_err(|error| ApiError::internal(error.to_string()))?;
@@ -931,7 +932,7 @@ fn import_logical_package(state: &AppState, package: LogicalPackageBody) -> Resu
             fs::write(target, module.source)
                 .map_err(|error| ApiError::internal(error.to_string()))?;
         }
-        let candidate_path = directory.join("candidate.nostdb");
+        let candidate_path = storage.join("candidate.nostdb");
         Synchronizer::default()
             .sync(&directory, &candidate_path)
             .map_err(|error| {

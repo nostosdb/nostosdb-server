@@ -40,7 +40,7 @@ class NpmDistributionTests(unittest.TestCase):
 
     def test_manifest_declares_six_exact_server_packages(self):
         manifest = release_manifest()
-        self.assertEqual(manifest["version"], "0.0.2")
+        self.assertEqual(manifest["version"], "0.0.3")
         self.assertEqual(
             set(manifest["targets"]),
             {
@@ -102,7 +102,7 @@ class NpmDistributionTests(unittest.TestCase):
                 executable = "package/bin/{}".format(executable_name(target))
                 self.assertEqual(contents[executable], binary.read_bytes())
             else:
-                self.assertEqual(manifest["dependencies"], {"@nostdb/cli": "0.0.2"})
+                self.assertEqual(manifest["dependencies"], {"@nostdb/cli": "0.0.3"})
                 self.assertEqual(set(manifest["bin"]), {"nostdb", "nostd"})
 
     def test_refuses_to_replace_an_existing_stage(self):
